@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=DM+Sans:wght@300;400;500;600&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background-color: #FAF7F2;
+    color: #1C1917;
+    overflow-x: hidden;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-dark text-white px-6 py-3 text-xs tracking-widest uppercase font-medium
+           hover:bg-warm transition-all duration-200 rounded-sm inline-flex items-center gap-2;
+  }
+  .btn-outline {
+    @apply border border-dark text-dark px-6 py-3 text-xs tracking-widest uppercase font-medium
+           hover:bg-dark hover:text-white transition-all duration-200 rounded-sm inline-flex items-center gap-2;
+  }
+  .input-field {
+    @apply w-full border border-gray-200 rounded-sm px-4 py-3 text-sm font-sans
+           focus:outline-none focus:border-warm focus:ring-1 focus:ring-warm
+           bg-white text-dark placeholder-muted transition-all duration-200;
+  }
+  .section-label {
+    @apply text-xs tracking-[0.25em] uppercase text-warm font-medium;
+  }
+  .section-title {
+    @apply font-display text-3xl md:text-4xl font-normal leading-tight text-dark;
+  }
+  .card-hover {
+    @apply transition-all duration-300 hover:-translate-y-1 hover:shadow-xl;
+  }
+}
+
+@layer utilities {
+  .font-display { font-family: 'Cormorant Garamond', serif; }
+  .scrollbar-hide::-webkit-scrollbar { display: none; }
+  .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+}
