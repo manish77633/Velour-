@@ -1,7 +1,8 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: process.env.REACT_APP_API_URL || 'http://localhost:5000/api',
+  // Pehle ye production URL dekhega, phir localhost
+  baseURL: process.env.REACT_APP_API_URL || 'https://velour-backend-ey1k.onrender.com/api',
   headers: { 'Content-Type': 'application/json' },
   withCredentials: true,
 });
@@ -23,7 +24,10 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       localStorage.removeItem('token');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      // Sirf redirect karo agar login page par nahi ho, taaki loop na bane
+      if (window.location.pathname !== '/login') {
+        window.location.href = '/login';
+      }
     }
     return Promise.reject(error);
   }
