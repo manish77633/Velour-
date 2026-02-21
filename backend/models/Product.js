@@ -51,7 +51,7 @@ const productSchema = new mongoose.Schema(
     },
     sizes: {
       type:    [String],
-      enum:    ['XS', 'S', 'M', 'L', 'XL', 'XXL', '2-3Y', '3-4Y', '4-5Y', '5-6Y', '6-7Y', '7-8Y', '8-9Y', '9-10Y', '10-11Y'],
+      enum:    ['XS', 'S', 'M', 'L', 'XL', 'XXL', '2-3Y', '3-4Y', '4-5Y', '5-6Y', '6-7Y', '7-8Y', '8-9Y', '9-10Y', '10-11Y','12-13Y','14-15Y','Standard','Free Size','26','28','30', '32', '34', '36','38', '40', '42', '44'],
       default: [],
     },
     colors: {
