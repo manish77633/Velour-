@@ -6,6 +6,7 @@ import ProductCard from '../components/product/ProductCard';
 import { ProductGridSkeleton } from '../components/common/Loader';
 import { FiArrowRight, FiTruck, FiRefreshCw, FiShield, FiStar } from 'react-icons/fi';
 import TestimonialsMarquee from '../components/TestimonialsMarquee';
+import { motion } from 'framer-motion';
 
 const CATEGORIES = [
   { 
@@ -71,17 +72,74 @@ export default function HomePage() {
               Curated fashion for Men, Women & Kids. Premium fabrics, timeless silhouettes,
               and designs that speak without words.
             </p>
-            <div className="flex gap-3 flex-wrap">
-              <Link to="/shop" className="btn-primary bg-warm hover:bg-accent py-3.5 px-7">
-                Shop Collection
-              </Link>
-              <Link to="/shop?category=Women"
-                className="border border-cream/25 text-cream hover:border-cream hover:bg-cream/5
-                           text-xs tracking-widest uppercase px-7 py-3.5 rounded-sm transition-all duration-200 inline-flex items-center gap-2">
-                Women's Edit <FiArrowRight size={14} />
-              </Link>
-            </div>
+<div className="flex gap-4 flex-wrap">
+  
+  {/* 1. Shop Collection Button */}
+  <motion.div
+    whileHover="hover"
+    whileTap="tap"
+    variants={{
+      hover: { scale: 1.04 },
+      tap: { scale: 0.96 }
+    }}
+  >
+    <Link 
+      to="/shop" 
+      className="relative overflow-hidden inline-flex items-center justify-center btn-primary bg-warm hover:bg-accent py-3.5 px-8 rounded-sm transition-all duration-300 group"
+    >
+      {/* ✨ Animated Hover Shine Effect ✨ */}
+      <motion.span 
+        variants={{ hover: { x: ['-100%', '200%'] } }}
+        transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+        className="absolute inset-0 w-[150%] h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 pointer-events-none"
+      />
+      
+      {/* Button Text & Icon */}
+      <span className="relative z-10 flex items-center gap-2.5 text-xs tracking-widest uppercase font-bold">
+        Shop Collection
+        {/* Flying Arrow Icon */}
+        <motion.svg 
+          variants={{ hover: { x: 4, y: -4 } }}
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4"
+        >
+          <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round"/>
+        </motion.svg>
+      </span>
+    </Link>
+  </motion.div>
 
+  {/* 2. Women's Edit Button */}
+  <motion.div
+    whileHover="hover"
+    whileTap="tap"
+    variants={{
+      hover: { scale: 1.04 },
+      tap: { scale: 0.96 }
+    }}
+  >
+    <Link 
+      to="/shop?category=Women"
+      className="relative overflow-hidden inline-flex items-center justify-center border border-cream/25 text-cream hover:border-cream hover:bg-cream/5 px-8 py-3.5 rounded-sm transition-all duration-300 group"
+    >
+      {/* ✨ Animated Hover Shine Effect (Subtle for outline button) ✨ */}
+      <motion.span 
+        variants={{ hover: { x: ['-100%', '200%'] } }}
+        transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+        className="absolute inset-0 w-[150%] h-full bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12 pointer-events-none"
+      />
+      
+      {/* Button Text & Icon */}
+      <span className="relative z-10 flex items-center gap-2.5 text-xs tracking-widest uppercase font-bold">
+        Women's Edit
+        {/* Flying Icon */}
+        <motion.div variants={{ hover: { x: 4, y: -4 } }}>
+          <FiArrowRight size={15} strokeWidth={2.5} />
+        </motion.div>
+      </span>
+    </Link>
+  </motion.div>
+
+</div>
             {/* Stats */}
             <div className="flex gap-8 mt-10 pt-8 border-t border-cream/10">
               {[['500+', 'Styles'], ['50K+', 'Customers'], ['4.9★', 'Rating']].map(([num, label]) => (
@@ -208,7 +266,38 @@ export default function HomePage() {
           )}
 
           <div className="text-center mt-10">
-            <Link to="/shop" className="btn-outline inline-flex">View All Products <FiArrowRight size={14} /></Link>
+              <motion.div
+    whileHover="hover"
+    whileTap="tap"
+    variants={{
+      hover: { scale: 1.04 },
+      tap: { scale: 0.96 }
+    }}
+  >
+    <Link 
+      to="/shop" 
+      className="relative overflow-hidden inline-flex items-center justify-center btn-primary bg-warm hover:bg-accent py-3.5 px-8 rounded-sm transition-all duration-300 group"
+    >
+      {/* ✨ Animated Hover Shine Effect ✨ */}
+      <motion.span 
+        variants={{ hover: { x: ['-100%', '200%'] } }}
+        transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+        className="absolute inset-0 w-[150%] h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 pointer-events-none"
+      />
+      
+      {/* Button Text & Icon */}
+      <span className="relative z-10 flex items-center gap-2.5 text-xs tracking-widest uppercase font-bold">
+        Shop Collection
+        {/* Flying Arrow Icon */}
+        <motion.svg 
+          variants={{ hover: { x: 4, y: -4 } }}
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4"
+        >
+          <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round"/>
+        </motion.svg>
+      </span>
+    </Link>
+  </motion.div>
           </div>
         </div>
       </section>
@@ -249,9 +338,38 @@ export default function HomePage() {
               <p className="text-sm text-cream/50 mb-6 leading-relaxed max-w-sm">
                 Shop premium fashion at unbelievable prices. Limited stock — grab yours before it's gone.
               </p>
-              <Link to="/shop?sort=price_low" className="btn-primary bg-warm hover:bg-accent inline-flex">
-                Shop the Sale <FiArrowRight size={14} />
-              </Link>
+  <motion.div
+    whileHover="hover"
+    whileTap="tap"
+    variants={{
+      hover: { scale: 1.04 },
+      tap: { scale: 0.96 }
+    }}
+  >
+    <Link 
+      to="/shop" 
+      className="relative overflow-hidden inline-flex items-center justify-center btn-primary bg-warm hover:bg-accent py-3.5 px-8 rounded-sm transition-all duration-300 group"
+    >
+      {/* ✨ Animated Hover Shine Effect ✨ */}
+      <motion.span 
+        variants={{ hover: { x: ['-100%', '200%'] } }}
+        transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+        className="absolute inset-0 w-[150%] h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 pointer-events-none"
+      />
+      
+      {/* Button Text & Icon */}
+      <span className="relative z-10 flex items-center gap-2.5 text-xs tracking-widest uppercase font-bold">
+        Shop The Sale
+        {/* Flying Arrow Icon */}
+        <motion.svg 
+          variants={{ hover: { x: 4, y: -4 } }}
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="w-4 h-4"
+        >
+          <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" strokeLinejoin="round"/>
+        </motion.svg>
+      </span>
+    </Link>
+  </motion.div>
             </div>
             <div className="hidden md:grid grid-cols-2 gap-3 relative z-10">
   {/* Left Image Box */}

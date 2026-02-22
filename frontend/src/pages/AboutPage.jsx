@@ -4,7 +4,7 @@
 // npm install framer-motion   (run once in /frontend)
 // ================================================================
 
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 
 // ── Premium Scroll Reveal ──────────────────────────────────────
@@ -105,6 +105,24 @@ export default function AboutPage() {
   const bgY = useTransform(scrollYProgress, [0, 1], ['0%', '30%']);
   const textY = useTransform(scrollYProgress, [0, 1], ['0%', '50%']);
   const heroOp = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+
+  // State for Email Button Copy Effect
+  const [isEmailCopied, setIsEmailCopied] = useState(false);
+
+  // Fail-proof Email Click Handler
+  const handleEmailClick = () => {
+    // 1. Copy to clipboard
+    navigator.clipboard.writeText('manishkumar20047877@gmail.com');
+    setIsEmailCopied(true);
+    
+    // 2. Open Gmail directly in browser (works everywhere)
+    const subject = encodeURIComponent("Hello Manish - Let's Connect");
+    const gmailUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=manishkumar20047877@gmail.com&su=${subject}`;
+    window.open(gmailUrl, '_blank');
+
+    // 3. Reset UI feedback after 3 seconds
+    setTimeout(() => setIsEmailCopied(false), 3000);
+  };
 
   return (
     <div className="min-h-screen overflow-x-hidden selection:bg-[#9C7A58] selection:text-white" style={{ backgroundColor: '#EBE6DF' }}>
@@ -362,14 +380,59 @@ export default function AboutPage() {
             ))}
           </div>
 
-          <Reveal className="text-center">
-            <motion.a href="mailto:manishkumar20047877@gmail.com" 
-              whileHover={{ scale: 1.04 }}
-              whileTap={{ scale: 0.96 }}
-              className="inline-block px-12 py-5 rounded-full text-xs tracking-[0.2em] uppercase font-bold text-[#F2EEE9] bg-[#2C241E] shadow-[0_10px_30px_rgba(44,36,30,0.2)] hover:bg-[#9C7A58] transition-colors duration-300"
+          <Reveal className="text-center flex flex-col items-center justify-center">
+            
+            {/* ✨ 100% WORKING GMAIL BUTTON ✨ */}
+            <motion.button 
+              onClick={handleEmailClick}
+              whileHover="hover"
+              whileTap="tap"
+              variants={{
+                hover: { scale: 1.04, backgroundColor: '#9C7A58' },
+                tap: { scale: 0.96 }
+              }}
+              className="group relative overflow-hidden inline-flex items-center justify-center gap-3 px-12 py-5 rounded-full text-xs tracking-[0.2em] uppercase font-bold text-[#F2EEE9] bg-[#2C241E] shadow-[0_10px_30px_rgba(44,36,30,0.2)] hover:shadow-[0_20px_40px_rgba(156,122,88,0.3)] transition-shadow duration-300 cursor-pointer border-none outline-none"
             >
-              Send Me an Email
-            </motion.a>
+              {/* Animated Hover Shine Effect */}
+              <motion.span 
+                variants={{ hover: { x: ['-100%', '200%'] } }}
+                transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+                className="absolute inset-0 w-[150%] h-full bg-gradient-to-r from-transparent via-white/20 to-transparent -skew-x-12 pointer-events-none"
+              />
+              
+              <span className="relative z-10 flex items-center gap-2.5">
+                {isEmailCopied ? "Opening Gmail..." : "Send Me an Email"}
+                
+                {/* Dynamic Icon */}
+                {!isEmailCopied ? (
+                  <motion.svg 
+                    variants={{ hover: { x: 4, y: -4 } }}
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4"
+                  >
+                    <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z" strokeLinecap="round" strokeLinejoin="round"/>
+                  </motion.svg>
+                ) : (
+                  <motion.svg 
+                    initial={{ scale: 0 }} animate={{ scale: 1 }}
+                    viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" className="w-4 h-4 text-[#F2EEE9]"
+                  >
+                    <path d="M20 6L9 17l-5-5" strokeLinecap="round" strokeLinejoin="round"/>
+                  </motion.svg>
+                )}
+              </span>
+            </motion.button>
+
+            {/* Helper text shown after clicking */}
+            {isEmailCopied && (
+              <motion.p 
+                initial={{ opacity: 0, y: 10 }} 
+                animate={{ opacity: 1, y: 0 }} 
+                className="text-[#8A7561] text-[10px] tracking-widest uppercase mt-4 font-bold"
+              >
+                Email Copied! Opening Webmail...
+              </motion.p>
+            )}
+
           </Reveal>
         </div>
       </section>
