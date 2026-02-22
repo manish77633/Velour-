@@ -1,25 +1,43 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { addToCart } from '../../redux/slices/cartSlice';
+import { addToWishlist, removeFromWishlist } from '../../redux/slices/wishlistSlice';
 import { formatPrice, calcDiscount } from '../../utils/formatPrice';
 import { FiHeart, FiShoppingBag, FiStar } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 const ProductCard = ({ product }) => {
-  const dispatch   = useDispatch();
-  const [wishlist, setWishlist] = useState(false);
-  const discount   = calcDiscount(product.price, product.originalPrice);
+  const dispatch = useDispatch();
+  
+  // Redux Wishlist State
+  const { wishlistItems } = useSelector((state) => state.wishlist || { wishlistItems: [] });
+  const isWishlisted = wishlistItems?.some((item) => item._id === product._id);
+
+  const discount = calcDiscount(product.price, product.originalPrice);
 
   const handleQuickAdd = (e) => {
     e.preventDefault();
+    e.stopPropagation();
     dispatch(addToCart({
       product,
-      size:  product.sizes?.[0] || 'M',
+      size: product.sizes?.[0] || 'M',
       color: product.colors?.[0] || '',
-      qty:   1,
+      qty: 1,
     }));
     toast.success(`${product.name} added to bag!`);
+  };
+
+  const handleWishlistToggle = (e) => {
+    e.preventDefault(); // Prevents redirecting to detail page
+    e.stopPropagation(); // Stops event bubbling
+    if (isWishlisted) {
+      dispatch(removeFromWishlist(product._id));
+      toast.success("Removed from wishlist");
+    } else {
+      dispatch(addToWishlist(product));
+      toast.success("Added to wishlist ❤️");
+    }
   };
 
   return (
@@ -48,19 +66,24 @@ const ProductCard = ({ product }) => {
           )}
         </div>
 
-        {/* Wishlist */}
-        <button onClick={(e) => { e.preventDefault(); setWishlist(!wishlist); toast.success(wishlist ? 'Removed from wishlist' : 'Added to wishlist'); }}
-          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 flex items-center justify-center
-                     opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-white shadow-sm">
-          <FiHeart size={14} className={wishlist ? 'fill-red-500 text-red-500' : 'text-dark'}/>
+        {/* Wishlist Button */}
+        <button 
+          onClick={handleWishlistToggle}
+          className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 shadow-sm z-20 
+            ${isWishlisted 
+              ? 'bg-white opacity-100 text-red-500' 
+              : 'bg-white/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 text-dark hover:bg-white'
+            }`}
+        >
+          <FiHeart size={14} className={isWishlisted ? 'fill-red-500' : ''} />
         </button>
 
         {/* Quick Add */}
         <button onClick={handleQuickAdd}
           className="absolute bottom-0 left-0 right-0 bg-dark text-white text-xs tracking-widest uppercase
                      py-3 flex items-center justify-center gap-2 translate-y-full group-hover:translate-y-0
-                     transition-transform duration-300 font-medium">
-          <FiShoppingBag size={14}/> Quick Add
+                     transition-transform duration-300 font-medium z-20">
+          <FiShoppingBag size={14} /> Quick Add
         </button>
       </div>
 
@@ -72,18 +95,18 @@ const ProductCard = ({ product }) => {
         {/* Rating */}
         <div className="flex items-center gap-1 mb-1.5">
           <div className="flex">
-            {[1,2,3,4,5].map((s) => (
+            {[1, 2, 3, 4, 5].map((s) => (
               <FiStar key={s} size={10}
-                className={s <= Math.round(product.averageRating) ? 'fill-accent text-accent' : 'text-soft'}/>
+                className={s <= Math.round(product.averageRating || 0) ? 'fill-accent text-accent' : 'text-soft'} />
             ))}
           </div>
-          <span className="text-[10px] text-muted">({product.numReviews})</span>
+          <span className="text-[10px] text-muted">({product.numReviews || 0})</span>
         </div>
 
         {/* Price */}
         <div className="flex items-center gap-2">
           <span className="text-sm font-semibold text-dark">{formatPrice(product.price)}</span>
-          {product.originalPrice && (
+          {product.originalPrice && product.originalPrice > product.price && (
             <span className="text-xs text-muted line-through">{formatPrice(product.originalPrice)}</span>
           )}
         </div>

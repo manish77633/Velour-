@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProductById, clearProduct, fetchProducts } from '../redux/slices/productSlice';
 import { addToCart } from '../redux/slices/cartSlice';
+import { addToWishlist, removeFromWishlist } from '../redux/slices/wishlistSlice';
 import { formatPrice, calcDiscount } from '../utils/formatPrice';
 import ReviewForm from '../components/product/ReviewForm';
 import { Loader } from '../components/common/Loader';
@@ -17,36 +18,34 @@ export default function ProductDetailPage() {
   const dispatch   = useDispatch();
   
   const { product, loading, products } = useSelector((s) => s.product);
+  
+  // Redux Wishlist check
+  const { wishlistItems } = useSelector((s) => s.wishlist || { wishlistItems: [] });
+  const isWishlisted = wishlistItems?.some((item) => item._id === product?._id);
 
   const [activeImg,  setActiveImg]  = useState(0);
   const [selSize,    setSelSize]    = useState('');
   const [selColor,   setSelColor]   = useState('');
   const [qty,        setQty]        = useState(1);
   const [activeTab,  setActiveTab]  = useState('description');
-  const [wishlist,   setWishlist]   = useState(false);
   
-  // Modal State for Size Guide
   const [isSizeGuideOpen, setIsSizeGuideOpen] = useState(false);
 
-  // Fetch product
   useEffect(() => {
     dispatch(fetchProductById(id));
     return () => dispatch(clearProduct());
   }, [id, dispatch]);
 
-  // Fetch all products for related section
   useEffect(() => {
     if (!products || products.length === 0) {
       dispatch(fetchProducts());
     }
   }, [dispatch, products?.length]);
 
-  // Scroll to top
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }, [id]);
 
-  // Set default selections
   useEffect(() => {
     if (product) {
       setSelSize(product.sizes?.[0] || '');
@@ -56,13 +55,8 @@ export default function ProductDetailPage() {
     }
   }, [product]);
 
-  // Lock background scroll when Size Guide is open
   useEffect(() => {
-    if (isSizeGuideOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'auto';
-    }
+    document.body.style.overflow = isSizeGuideOpen ? 'hidden' : 'auto';
     return () => { document.body.style.overflow = 'auto'; };
   }, [isSizeGuideOpen]);
 
@@ -70,6 +64,16 @@ export default function ProductDetailPage() {
     if (!selSize) return toast.error('Please select a size');
     dispatch(addToCart({ product, size: selSize, color: selColor, qty }));
     toast.success(`${product.name} added to bag!`);
+  };
+
+  const handleWishlistToggle = () => {
+    if (isWishlisted) {
+      dispatch(removeFromWishlist(product._id));
+      toast.success("Removed from wishlist");
+    } else {
+      dispatch(addToWishlist(product));
+      toast.success("Added to wishlist ❤️");
+    }
   };
 
   const relatedProducts = useMemo(() => {
@@ -223,10 +227,11 @@ export default function ProductDetailPage() {
               <button onClick={handleAddToCart} className="flex-1 btn-primary justify-center py-4 text-sm font-bold tracking-widest uppercase">
                 <FiShoppingBag size={18} className="mr-2 inline-block"/> Add to Bag
               </button>
-              <button onClick={() => setWishlist(!wishlist)}
+              
+              <button onClick={handleWishlistToggle}
                 className={`w-14 h-14 border rounded-sm flex items-center justify-center transition-all bg-white
-                  ${wishlist ? 'border-red-400 bg-red-50 shadow-inner' : 'border-soft hover:border-dark'}`}>
-                <FiHeart size={20} className={wishlist ? 'fill-red-500 text-red-500' : 'text-dark'}/>
+                  ${isWishlisted ? 'border-red-400 bg-red-50 shadow-inner' : 'border-soft hover:border-dark'}`}>
+                <FiHeart size={20} className={isWishlisted ? 'fill-red-500 text-red-500' : 'text-dark'}/>
               </button>
             </div>
 
@@ -276,7 +281,7 @@ export default function ProductDetailPage() {
             </div>
           ) : (
             <div className="max-w-3xl space-y-10">
-              {/* Rating Summary & Review List remain the same */}
+              {/* Rating Summary */}
               {product.numReviews > 0 && (
                 <div className="flex flex-col md:flex-row items-center gap-10 p-8 bg-white border border-soft rounded-sm">
                   <div className="text-center md:border-r md:border-soft md:pr-10">
@@ -306,6 +311,7 @@ export default function ProductDetailPage() {
                 </div>
               )}
 
+              {/* Reviews List */}
               {product.reviews?.length > 0 ? (
                 <div className="space-y-6">
                   {product.reviews.map((rv) => (
@@ -334,6 +340,7 @@ export default function ProductDetailPage() {
                 <p className="text-sm text-muted italic">No reviews yet. Be the first to review this product!</p>
               )}
 
+              {/* Review Form */}
               <div className="bg-soft p-6 md:p-8 rounded-sm">
                 <h3 className="text-lg font-display mb-4 text-dark">Write a Review</h3>
                 <ReviewForm productId={product._id}/>
@@ -355,13 +362,37 @@ export default function ProductDetailPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-8">
               {relatedProducts.map((relProd) => {
                 const relDiscount = calcDiscount(relProd.price, relProd.originalPrice);
+                
+                // NAYA: Related product ke liye bhi check karein ki wishlist me hai ya nahi
+                const isRelWishlisted = wishlistItems?.some((item) => item._id === relProd._id);
+
                 return (
                   <Link key={relProd._id} to={`/product/${relProd._id}`} className="group block no-underline">
                     <div className="aspect-[3/4] bg-soft rounded-sm overflow-hidden mb-4 relative">
                       <img src={relProd.images?.[0] || '/placeholder.jpg'} alt={relProd.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-                      <button className="absolute top-3 right-3 w-8 h-8 bg-white/80 backdrop-blur-sm rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 hover:bg-white text-dark shadow-sm">
-                        <FiHeart size={14}/>
+                      
+                      {/* Hover Action / Wishlist icon */}
+                      <button 
+                        onClick={(e) => {
+                           e.preventDefault();
+                           e.stopPropagation();
+                           if (isRelWishlisted) {
+                             dispatch(removeFromWishlist(relProd._id));
+                             toast.success("Removed from wishlist");
+                           } else {
+                             dispatch(addToWishlist(relProd));
+                             toast.success("Added to wishlist ❤️");
+                           }
+                        }}
+                        className={`absolute top-3 right-3 w-8 h-8 rounded-full flex items-center justify-center transition-all duration-300 shadow-sm
+                          ${isRelWishlisted 
+                            ? 'bg-white opacity-100 text-red-500' 
+                            : 'bg-white/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 text-dark hover:bg-white'
+                          }`}
+                      >
+                        <FiHeart size={14} className={isRelWishlisted ? 'fill-red-500' : ''}/>
                       </button>
+
                       {relDiscount > 0 && (
                         <span className="absolute top-3 left-3 bg-red-600 text-white text-[9px] font-bold tracking-[0.2em] px-2.5 py-1 uppercase rounded-sm shadow-sm">
                           Sale
@@ -387,31 +418,22 @@ export default function ProductDetailPage() {
 
       </div>
 
-      {/* ════════════════════════════════════════════════════════ */}
       {/* ── SIZE GUIDE MODAL (POPUP) ── */}
-      {/* ════════════════════════════════════════════════════════ */}
       {isSizeGuideOpen && (
         <div 
           className="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm p-4 transition-opacity"
-          onClick={() => setIsSizeGuideOpen(false)} // Background pe click karne se band hoga
+          onClick={() => setIsSizeGuideOpen(false)} 
         >
-          {/* Modal Container */}
           <div 
             className="bg-cream w-full max-w-lg rounded-sm shadow-2xl overflow-hidden relative animate-fade-in-up"
-            onClick={(e) => e.stopPropagation()} // Box ke andar click karne se band nahi hoga
+            onClick={(e) => e.stopPropagation()} 
           >
-            {/* Header */}
             <div className="px-6 py-5 border-b border-soft flex justify-between items-center bg-white">
               <h3 className="font-display text-2xl text-dark">Size Guide</h3>
-              <button 
-                onClick={() => setIsSizeGuideOpen(false)}
-                className="p-2 text-muted hover:text-dark hover:bg-soft rounded-full transition-colors"
-              >
+              <button onClick={() => setIsSizeGuideOpen(false)} className="p-2 text-muted hover:text-dark hover:bg-soft rounded-full transition-colors">
                 <FiX size={22} />
               </button>
             </div>
-
-            {/* Table Area */}
             <div className="p-6 bg-white">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
@@ -431,7 +453,7 @@ export default function ProductDetailPage() {
                       { s: 'L',  w: '32 - 34', c: '40 - 42', l: '30' },
                       { s: 'XL', w: '34 - 36', c: '42 - 44', l: '31' },
                       { s: 'XXL',w: '36 - 38', c: '44 - 46', l: '32' },
-                    ].map((row, i) => (
+                    ].map((row) => (
                       <tr key={row.s} className="border-b border-soft hover:bg-soft/50 transition-colors">
                         <td className="py-3.5 pr-4 font-bold text-dark">{row.s}</td>
                         <td className="py-3.5 px-4 text-muted">{row.w}</td>
@@ -442,8 +464,6 @@ export default function ProductDetailPage() {
                   </tbody>
                 </table>
               </div>
-
-              {/* Note / Footer */}
               <div className="mt-6 pt-5 border-t border-soft text-center">
                 <p className="text-[11px] uppercase tracking-widest text-muted">
                   Measurements are provided as a guide only.<br/> Fits may vary by style or personal preference.
@@ -453,7 +473,6 @@ export default function ProductDetailPage() {
           </div>
         </div>
       )}
-
     </main>
   );
 }

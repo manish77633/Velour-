@@ -20,6 +20,9 @@ const Navbar = () => {
   const location  = useLocation();
   const { user }  = useSelector((s) => s.auth);
   const { totalQty } = useSelector((s) => s.cart);
+  
+  // Redux Wishlist State for Badge
+  const { wishlistItems } = useSelector((s) => s.wishlist || { wishlistItems: [] });
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -46,7 +49,7 @@ const Navbar = () => {
     { label: 'Women',        to: '/shop?category=Women' },
     { label: 'Kids',         to: '/shop?category=Kids' },
     { label: 'Sale',         to: '/shop?sort=price_low' },
-    { label: 'About',         to: '/about' },
+    { label: 'About',        to: '/about' },
   ];
 
   return (
@@ -80,8 +83,13 @@ const Navbar = () => {
             </button>
 
             {/* Wishlist */}
-            <Link to="/profile" className="w-10 h-10 hidden md:flex items-center justify-center rounded-full hover:bg-soft transition-colors">
+            <Link to="/profile?tab=wishlist" className="w-10 h-10 hidden md:flex items-center justify-center rounded-full hover:bg-soft transition-colors relative">
               <FiHeart size={18} />
+              {wishlistItems?.length > 0 && (
+                <span className="absolute top-1 right-1 bg-warm text-white text-[10px] w-4 h-4 rounded-full flex items-center justify-center font-semibold">
+                  {wishlistItems.length}
+                </span>
+              )}
             </Link>
 
             {/* Cart */}
