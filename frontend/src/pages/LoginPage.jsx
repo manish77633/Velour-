@@ -100,7 +100,12 @@ export default function LoginPage() {
             <div>
               <div className="flex justify-between items-center mb-1.5">
                 <label className="block text-xs tracking-[0.12em] uppercase text-muted font-medium">Password</label>
-                {mode === 'login' && <a href="#" className="text-xs text-warm hover:underline">Forgot password?</a>}
+                {/* 👉 NAYA: Forgot Password working Link */}
+                {mode === 'login' && (
+                  <Link to="/forgot-password" className="text-xs text-warm hover:underline underline-offset-2">
+                    Forgot password?
+                  </Link>
+                )}
               </div>
               <input name="password" value={form.password} onChange={handleChange}
                 type="password" placeholder="••••••••" className="input-field" required/>

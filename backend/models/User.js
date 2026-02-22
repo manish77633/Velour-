@@ -31,7 +31,7 @@ const userSchema = new mongoose.Schema(
     password: {
       type:     String,
       minlength: [6, 'Password must be at least 6 characters'],
-      select:   false,   // never return password in queries
+      select:   false,
     },
     googleId:       { type: String },
     profilePicture: { type: String, default: '' },
@@ -41,6 +41,10 @@ const userSchema = new mongoose.Schema(
     addresses:      [addressSchema],
     orderHistory:   [{ type: mongoose.Schema.Types.ObjectId, ref: 'Order' }],
     wishlist:       [{ type: mongoose.Schema.Types.ObjectId, ref: 'Product' }],
+    
+    // 👉 FORGOT PASSWORD FIELDS
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
   },
   { timestamps: true }
 );

@@ -3,7 +3,8 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { loadUserFromStorage } from './redux/slices/authSlice';
 import { loadCartFromStorage } from './redux/slices/cartSlice';
-
+import ForgotPasswordPage from './pages/ForgotPasswordPage'; // Ise top par import karein
+import ResetPasswordPage from './pages/ResetPasswordPage';
 import Navbar      from './components/layout/Navbar';
 import Footer      from './components/layout/Footer';
 import CartDrawer  from './components/cart/CartDrawer';
@@ -19,7 +20,8 @@ import LoginPage         from './pages/LoginPage';
 import ProfilePage       from './pages/ProfilePage';
 import AuthSuccessPage   from './pages/AuthSuccessPage';
 import ProtectedRoute    from './components/auth/ProtectedRoute';
-import AboutPage from './pages/AboutPage';
+import AboutPage         from './pages/AboutPage';
+
 
 import AdminDashboard   from './pages/admin/AdminDashboard';
 import AdminProducts    from './pages/admin/AdminProducts';
@@ -66,6 +68,8 @@ function App() {
               <Route path="/login"         element={<LoginPage/>}/>
               <Route path="/auth/success"  element={<AuthSuccessPage/>}/>
               <Route path="/about"         element={<AboutPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+              <Route path="/reset-password/:token" element={<ResetPasswordPage />} />
               <Route element={<ProtectedRoute/>}>
                 <Route path="/checkout"          element={<CheckoutPage/>}/>
                 <Route path="/order-success/:id" element={<OrderSuccessPage/>}/>

@@ -1,18 +1,18 @@
 // frontend/src/pages/admin/AdminProductForm.jsx
-// Used for BOTH Add New Product AND Edit Product
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
+import { motion, Reorder, AnimatePresence } from 'framer-motion'; // Animation & Drag-Drop
 import api from '../../services/api';
-import { FiArrowLeft, FiPlus, FiX, FiImage, FiSave } from 'react-icons/fi';
+import { FiArrowLeft, FiPlus, FiX, FiImage, FiSave, FiCheck, FiMove, FiInfo } from 'react-icons/fi';
 import toast from 'react-hot-toast';
 
 const SIZES_MEN_WOMEN = ['XS','S','M','L','XL','XXL'];
 const SIZES_KIDS       = ['2-3Y','4-5Y','6-7Y','8-9Y','10-11Y'];
 const COLOR_PRESETS    = [
-  { name:'Black',  hex:'#1C1917' },{ name:'White',  hex:'#FAF7F2' },
-  { name:'Brown',  hex:'#8B6F5C' },{ name:'Beige',  hex:'#EDE8DF' },
-  { name:'Accent', hex:'#C4A882' },{ name:'Blue',   hex:'#4A6FA5' },
-  { name:'Green',  hex:'#6B8F71' },{ name:'Red',    hex:'#C0392B' },
+  { name:'Black',  hex:'#1C1917' }, { name:'White',  hex:'#FFFFFF' },
+  { name:'Brown',  hex:'#8B6F5C' }, { name:'Beige',  hex:'#EDE8DF' },
+  { name:'Navy',   hex:'#1e3a8a' }, { name:'Blue',   hex:'#4A6FA5' },
+  { name:'Green',  hex:'#6B8F71' }, { name:'Red',    hex:'#C0392B' },
 ];
 
 const EMPTY_FORM = {
@@ -22,8 +22,19 @@ const EMPTY_FORM = {
   sizes:[], colors:[], images:[], tags:[],
 };
 
+// Animation Variants
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } }
+};
+
+const itemVariants = {
+  hidden: { y: 20, opacity: 0 },
+  visible: { y: 0, opacity: 1, transition: { type: "spring", stiffness: 100 } }
+};
+
 export default function AdminProductForm() {
-  const { id }   = useParams();       // exists → edit mode
+  const { id }   = useParams();
   const isEdit   = Boolean(id);
   const navigate = useNavigate();
 
@@ -33,7 +44,7 @@ export default function AdminProductForm() {
   const [imgInput,setImgInput]= useState('');
   const [tagInput,setTagInput]= useState('');
 
-  // Load product for edit
+  // Load product logic (Unchanged)
   useEffect(() => {
     if (!isEdit) return;
     api.get(`/products/${id}`).then(({ data }) => {
@@ -59,21 +70,15 @@ export default function AdminProductForm() {
 
   const set = (key, val) => setForm((f) => ({ ...f, [key]: val }));
 
-  // Toggle size
+  // Handlers (Unchanged Logic)
   const toggleSize = (s) => {
-    set('sizes', form.sizes.includes(s)
-      ? form.sizes.filter((x) => x !== s)
-      : [...form.sizes, s]);
+    set('sizes', form.sizes.includes(s) ? form.sizes.filter((x) => x !== s) : [...form.sizes, s]);
   };
 
-  // Toggle color
   const toggleColor = (hex) => {
-    set('colors', form.colors.includes(hex)
-      ? form.colors.filter((x) => x !== hex)
-      : [...form.colors, hex]);
+    set('colors', form.colors.includes(hex) ? form.colors.filter((x) => x !== hex) : [...form.colors, hex]);
   };
 
-  // Add image URL
   const addImage = () => {
     const url = imgInput.trim();
     if (!url) return;
@@ -82,9 +87,9 @@ export default function AdminProductForm() {
     setImgInput('');
   };
 
-  // Add tag
   const addTag = (e) => {
     if (e.key === 'Enter' && tagInput.trim()) {
+      e.preventDefault(); // Prevent form submit on enter
       const tag = tagInput.trim().toLowerCase();
       if (!form.tags.includes(tag)) set('tags', [...form.tags, tag]);
       setTagInput('');
@@ -114,10 +119,10 @@ export default function AdminProductForm() {
       };
       if (isEdit) {
         await api.put(`/products/${id}`, payload);
-        toast.success('Product updated!');
+        toast.success('Product updated successfully');
       } else {
         await api.post('/products', payload);
-        toast.success('Product added!');
+        toast.success('Product added successfully');
       }
       navigate('/admin/products');
     } catch (err) {
@@ -128,267 +133,397 @@ export default function AdminProductForm() {
   const sizesArr = form.category === 'Kids' ? SIZES_KIDS : SIZES_MEN_WOMEN;
 
   if (fetching) return (
-    <div className="flex items-center justify-center h-64">
-      <div className="w-8 h-8 border-2 border-soft border-t-warm rounded-full animate-spin"/>
+    <div className="flex items-center justify-center min-h-[60vh]">
+      <div className="w-10 h-10 border-2 border-soft border-t-warm rounded-full animate-spin"/>
     </div>
   );
 
   return (
-    <div>
+    <motion.div 
+      initial="hidden" 
+      animate="visible" 
+      variants={containerVariants}
+      className="pb-10"
+    >
       {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
+      <motion.div variants={itemVariants} className="flex items-center gap-4 mb-8">
         <Link to="/admin/products"
-          className="w-9 h-9 flex items-center justify-center border border-soft rounded-sm hover:border-dark transition-colors">
-          <FiArrowLeft size={16}/>
+          className="w-10 h-10 flex items-center justify-center bg-white border border-soft rounded-lg text-muted hover:text-dark hover:border-warm transition-all duration-300 shadow-sm hover:shadow">
+          <FiArrowLeft size={18}/>
         </Link>
         <div>
-          <h1 className="font-display text-3xl">{isEdit ? 'Edit Product' : 'Add New Product'}</h1>
-          <p className="text-sm text-muted mt-0.5">{isEdit ? 'Update product details' : 'Fill in details to add a new product'}</p>
+          <h1 className="font-display text-3xl font-normal text-dark">
+            {isEdit ? 'Edit Product' : 'Add New Product'}
+          </h1>
+          <p className="text-sm text-muted mt-1 tracking-wide font-light">
+            {isEdit ? 'Update product details and inventory' : 'Fill in the details to create a new product'}
+          </p>
         </div>
-      </div>
+      </motion.div>
 
-      <form onSubmit={handleSubmit}>
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <form onSubmit={handleSubmit} className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        {/* ── LEFT COLUMN: Main Form ── */}
+        <div className="lg:col-span-2 space-y-6">
+          
+          {/* Section: Basic Info */}
+          <motion.div variants={itemVariants} className="bg-white rounded-xl border border-soft p-8 shadow-sm hover:shadow-md transition-shadow duration-300">
+            <h2 className="font-display text-xl text-dark mb-6 flex items-center gap-2">
+              Basic Information
+            </h2>
+            <div className="space-y-6">
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wider text-muted mb-1.5 block">Product Name</label>
+                <input 
+                  value={form.name} 
+                  onChange={(e) => set('name', e.target.value)}
+                  className="w-full bg-gray-50 border border-soft rounded-lg px-4 py-3 text-dark focus:outline-none focus:ring-1 focus:ring-warm focus:border-warm transition-all placeholder:text-muted/50"
+                  placeholder="e.g. Classic Linen Shirt" 
+                />
+              </div>
+              
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wider text-muted mb-1.5 block">Description</label>
+                <textarea 
+                  value={form.description} 
+                  onChange={(e) => set('description', e.target.value)}
+                  className="w-full bg-gray-50 border border-soft rounded-lg px-4 py-3 text-dark focus:outline-none focus:ring-1 focus:ring-warm focus:border-warm transition-all placeholder:text-muted/50 min-h-[120px] resize-none"
+                  placeholder="Describe the product details..."
+                />
+              </div>
 
-          {/* ── LEFT COL: Main Info ── */}
-          <div className="lg:col-span-2 space-y-5">
-
-            {/* Basic Info */}
-            <div className="bg-white rounded-sm border border-soft p-6">
-              <h2 className="font-display text-lg mb-5 pb-3 border-b border-soft">Basic Information</h2>
-              <div className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div>
-                  <label className="form-label">Product Name *</label>
-                  <input value={form.name} onChange={(e) => set('name', e.target.value)}
-                    className="input-field mt-1.5" placeholder="e.g. Classic Linen Shirt" required/>
-                </div>
-                <div>
-                  <label className="form-label">Description *</label>
-                  <textarea value={form.description} onChange={(e) => set('description', e.target.value)}
-                    className="input-field mt-1.5 resize-none" rows={4}
-                    placeholder="Describe the product, fabric, fit, and features..."/>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="form-label">Category *</label>
-                    <select value={form.category} onChange={(e) => set('category', e.target.value)}
-                      className="input-field mt-1.5">
+                  <label className="text-xs font-bold uppercase tracking-wider text-muted mb-1.5 block">Category</label>
+                  <div className="relative">
+                    <select 
+                      value={form.category} 
+                      onChange={(e) => set('category', e.target.value)}
+                      className="w-full bg-gray-50 border border-soft rounded-lg px-4 py-3 text-dark focus:outline-none focus:ring-1 focus:ring-warm focus:border-warm appearance-none cursor-pointer"
+                    >
                       <option>Men</option>
                       <option>Women</option>
                       <option>Kids</option>
+                      <option>Accessories</option>
                     </select>
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-muted">▼</div>
                   </div>
-                  <div>
-                    <label className="form-label">Sub Category</label>
-                    <input value={form.subCategory} onChange={(e) => set('subCategory', e.target.value)}
-                      className="input-field mt-1.5" placeholder="e.g. Shirts, Dresses, T-Shirts"/>
-                  </div>
+                </div>
+                <div>
+                  <label className="text-xs font-bold uppercase tracking-wider text-muted mb-1.5 block">Sub Category</label>
+                  <input 
+                    value={form.subCategory} 
+                    onChange={(e) => set('subCategory', e.target.value)}
+                    className="w-full bg-gray-50 border border-soft rounded-lg px-4 py-3 text-dark focus:outline-none focus:ring-1 focus:ring-warm focus:border-warm"
+                    placeholder="e.g. Shirts, Pants"
+                  />
                 </div>
               </div>
             </div>
+          </motion.div>
 
-            {/* Pricing & Stock */}
-            <div className="bg-white rounded-sm border border-soft p-6">
-              <h2 className="font-display text-lg mb-5 pb-3 border-b border-soft">Pricing & Stock</h2>
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="form-label">Selling Price (₹) *</label>
-                  <input type="number" min="0" value={form.price}
-                    onChange={(e) => set('price', e.target.value)}
-                    className="input-field mt-1.5" placeholder="2499"/>
-                </div>
-                <div>
-                  <label className="form-label">Original Price (₹)</label>
-                  <input type="number" min="0" value={form.originalPrice}
-                    onChange={(e) => set('originalPrice', e.target.value)}
-                    className="input-field mt-1.5" placeholder="3499 (optional)"/>
-                  <p className="text-xs text-muted mt-1">Leave empty if no discount</p>
-                </div>
-                <div>
-                  <label className="form-label">Stock Quantity *</label>
-                  <input type="number" min="0" value={form.stockQuantity}
-                    onChange={(e) => set('stockQuantity', e.target.value)}
-                    className="input-field mt-1.5" placeholder="50"/>
-                </div>
-              </div>
-              {form.price && form.originalPrice && Number(form.originalPrice) > Number(form.price) && (
-                <div className="mt-3 p-2.5 bg-green-50 border border-green-200 rounded-sm text-xs text-green-700">
-                  ✓ Discount: {Math.round(((form.originalPrice - form.price) / form.originalPrice) * 100)}% off
-                </div>
-              )}
+          {/* Section: Images (Drag & Drop) */}
+          <motion.div variants={itemVariants} className="bg-white rounded-xl border border-soft p-8 shadow-sm hover:shadow-md transition-shadow duration-300">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="font-display text-xl text-dark">Product Images</h2>
+              <span className="text-xs text-muted bg-gray-50 px-2 py-1 rounded border border-soft">
+                Drag to reorder
+              </span>
             </div>
 
-            {/* Images */}
-            <div className="bg-white rounded-sm border border-soft p-6">
-              <h2 className="font-display text-lg mb-5 pb-3 border-b border-soft">Product Images</h2>
-              <p className="text-xs text-muted mb-3">Paste image URLs (from Unsplash, your server, Cloudinary, etc.)</p>
-
-              {/* Image preview grid */}
-              {form.images.length > 0 && (
-                <div className="grid grid-cols-4 gap-2 mb-4">
-                  {form.images.map((img, i) => (
-                    <div key={i} className="relative aspect-[3/4] rounded-sm overflow-hidden bg-soft group">
-                      <img src={img} alt="" className="w-full h-full object-cover"/>
-                      <button type="button" onClick={() => set('images', form.images.filter((_,j) => j !== i))}
-                        className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs
-                                   flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                        <FiX size={10}/>
-                      </button>
-                      {i === 0 && <span className="absolute bottom-1 left-1 text-[9px] bg-dark text-white px-1 rounded">Main</span>}
+            {/* Reorder Group for Drag and Drop */}
+            <Reorder.Group 
+              axis="y" 
+              values={form.images} 
+              onReorder={(newOrder) => set('images', newOrder)}
+              className="space-y-3 mb-6"
+            >
+              <AnimatePresence initial={false}>
+                {form.images.map((img, index) => (
+                  <Reorder.Item 
+                    key={img} 
+                    value={img}
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: 'auto' }}
+                    exit={{ opacity: 0, height: 0 }}
+                    whileDrag={{ scale: 1.02, boxShadow: "0px 10px 20px rgba(0,0,0,0.1)" }}
+                    className="relative bg-white border border-soft rounded-lg p-2 flex items-center gap-4 group cursor-grab active:cursor-grabbing"
+                  >
+                    {/* Handle */}
+                    <div className="pl-2 text-muted/50 hover:text-muted">
+                      <FiMove size={16}/>
                     </div>
-                  ))}
-                </div>
-              )}
 
-              <div className="flex gap-2">
-                <div className="relative flex-1">
-                  <FiImage size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"/>
-                  <input value={imgInput} onChange={(e) => setImgInput(e.target.value)}
-                    onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addImage())}
-                    className="input-field pl-9 text-sm" placeholder="https://images.unsplash.com/..."/>
-                </div>
-                <button type="button" onClick={addImage}
-                  className="btn-outline py-2.5 px-4 text-xs flex items-center gap-1.5">
-                  <FiPlus size={13}/> Add
-                </button>
-              </div>
-              <p className="text-xs text-muted mt-2">Press Enter or click Add. First image = main image.</p>
+                    {/* Thumbnail */}
+                    <div className="w-16 h-20 bg-gray-100 rounded overflow-hidden flex-shrink-0 border border-soft">
+                      <img src={img} alt="Product" className="w-full h-full object-cover"/>
+                    </div>
+
+                    {/* Info */}
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-muted truncate">{img}</p>
+                      {index === 0 && (
+                        <span className="inline-block mt-1 text-[10px] font-bold uppercase tracking-wider bg-dark text-white px-2 py-0.5 rounded-full">
+                          Main Image
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Remove Btn */}
+                    <button 
+                      type="button"
+                      onClick={() => set('images', form.images.filter(url => url !== img))}
+                      className="p-2 text-muted hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors mr-2"
+                    >
+                      <FiX size={16}/>
+                    </button>
+                  </Reorder.Item>
+                ))}
+              </AnimatePresence>
+            </Reorder.Group>
+
+            {/* Add Image Input */}
+            <div className="relative">
+              <FiImage size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted"/>
+              <input 
+                value={imgInput} 
+                onChange={(e) => setImgInput(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addImage())}
+                className="w-full pl-12 pr-20 py-3 bg-gray-50 border border-soft rounded-lg text-sm focus:outline-none focus:border-warm transition-all"
+                placeholder="Paste image URL and press Enter..."
+              />
+              <button 
+                type="button" 
+                onClick={addImage}
+                className="absolute right-2 top-1/2 -translate-y-1/2 px-3 py-1.5 bg-white border border-soft rounded text-xs font-medium hover:border-dark transition-colors"
+              >
+                Add
+              </button>
             </div>
+          </motion.div>
 
+          {/* Section: Pricing & Stock */}
+          <motion.div variants={itemVariants} className="bg-white rounded-xl border border-soft p-8 shadow-sm hover:shadow-md transition-shadow duration-300">
+            <h2 className="font-display text-xl text-dark mb-6">Inventory & Pricing</h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wider text-muted mb-1.5 block">Price (₹)</label>
+                <input 
+                  type="number" 
+                  min="0" 
+                  value={form.price}
+                  onChange={(e) => set('price', e.target.value)}
+                  className="w-full bg-gray-50 border border-soft rounded-lg px-4 py-3 text-dark focus:border-warm focus:ring-0" 
+                  placeholder="0.00"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wider text-muted mb-1.5 block">Original Price</label>
+                <input 
+                  type="number" 
+                  min="0" 
+                  value={form.originalPrice}
+                  onChange={(e) => set('originalPrice', e.target.value)}
+                  className="w-full bg-gray-50 border border-soft rounded-lg px-4 py-3 text-dark focus:border-warm focus:ring-0" 
+                  placeholder="Optional"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold uppercase tracking-wider text-muted mb-1.5 block">Stock Quantity</label>
+                <input 
+                  type="number" 
+                  min="0" 
+                  value={form.stockQuantity}
+                  onChange={(e) => set('stockQuantity', e.target.value)}
+                  className="w-full bg-gray-50 border border-soft rounded-lg px-4 py-3 text-dark focus:border-warm focus:ring-0" 
+                  placeholder="0"
+                />
+              </div>
+            </div>
+            {/* Discount Badge Preview */}
+            {form.price && form.originalPrice && Number(form.originalPrice) > Number(form.price) && (
+              <motion.div 
+                initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}
+                className="mt-4 inline-flex items-center gap-2 px-3 py-2 bg-green-50 text-green-700 rounded border border-green-200 text-xs font-medium"
+              >
+                <FiCheck size={12}/>
+                Calculated Discount: {Math.round(((form.originalPrice - form.price) / form.originalPrice) * 100)}% OFF
+              </motion.div>
+            )}
+          </motion.div>
+
+          {/* Section: Variants (Sizes/Colors) */}
+          <motion.div variants={itemVariants} className="bg-white rounded-xl border border-soft p-8 shadow-sm hover:shadow-md transition-shadow duration-300">
+            <h2 className="font-display text-xl text-dark mb-6">Product Variants</h2>
+            
             {/* Sizes */}
-            <div className="bg-white rounded-sm border border-soft p-6">
-              <h2 className="font-display text-lg mb-4 pb-3 border-b border-soft">Available Sizes *</h2>
+            <div className="mb-6">
+              <label className="text-xs font-bold uppercase tracking-wider text-muted mb-3 block">Available Sizes</label>
               <div className="flex flex-wrap gap-2">
                 {sizesArr.map((s) => (
-                  <button key={s} type="button" onClick={() => toggleSize(s)}
-                    className={`px-4 py-2 text-sm border rounded-sm transition-all font-medium
-                      ${form.sizes.includes(s) ? 'bg-dark text-white border-dark' : 'border-soft hover:border-dark'}`}>
+                  <button 
+                    key={s} 
+                    type="button" 
+                    onClick={() => toggleSize(s)}
+                    className={`min-w-[48px] h-10 px-3 rounded text-sm font-medium transition-all duration-200 border
+                      ${form.sizes.includes(s) 
+                        ? 'bg-dark text-white border-dark shadow-md scale-105' 
+                        : 'bg-white text-muted border-soft hover:border-warm hover:text-dark'}`}
+                  >
                     {s}
                   </button>
                 ))}
               </div>
-              {form.sizes.length === 0 && (
-                <p className="text-xs text-red-400 mt-2">Select at least one size</p>
-              )}
             </div>
 
             {/* Colors */}
-            <div className="bg-white rounded-sm border border-soft p-6">
-              <h2 className="font-display text-lg mb-4 pb-3 border-b border-soft">Available Colors</h2>
-              <div className="flex flex-wrap gap-3 mb-3">
+            <div>
+              <label className="text-xs font-bold uppercase tracking-wider text-muted mb-3 block">Available Colors</label>
+              <div className="flex flex-wrap gap-3">
                 {COLOR_PRESETS.map(({ name, hex }) => (
-                  <div key={hex} className="flex flex-col items-center gap-1">
-                    <button type="button" onClick={() => toggleColor(hex)}
-                      className={`w-9 h-9 rounded-full border-3 transition-all
-                        ${form.colors.includes(hex) ? 'ring-2 ring-offset-2 ring-dark border-dark' : 'border-transparent'}
-                        ${hex === '#FAF7F2' ? 'border border-soft' : ''}`}
-                      style={{ background: hex }} title={name}/>
-                    <span className="text-[9px] text-muted">{name}</span>
-                  </div>
+                  <button 
+                    key={hex} 
+                    type="button" 
+                    onClick={() => toggleColor(hex)}
+                    className={`w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300 relative group
+                      ${form.colors.includes(hex) ? 'ring-2 ring-offset-2 ring-warm scale-110' : 'hover:scale-105'}`}
+                    style={{ backgroundColor: hex }}
+                    title={name}
+                  >
+                    {/* Checkmark for active */}
+                    {form.colors.includes(hex) && (
+                      <FiCheck size={14} className={hex === '#FFFFFF' || hex === '#FAF7F2' ? 'text-dark' : 'text-white'}/>
+                    )}
+                    {/* Border for light colors */}
+                    {(hex === '#FFFFFF' || hex === '#FAF7F2') && (
+                      <span className="absolute inset-0 rounded-full border border-soft/50"/>
+                    )}
+                  </button>
                 ))}
               </div>
-              {form.colors.length > 0 && (
-                <p className="text-xs text-muted">{form.colors.length} color{form.colors.length > 1 ? 's' : ''} selected</p>
-              )}
+            </div>
+          </motion.div>
+        </div>
+
+        {/* ── RIGHT COLUMN: Sidebar ── */}
+        <div className="space-y-6">
+          
+          {/* Status Card (Sticky) */}
+          <motion.div variants={itemVariants} className="bg-white rounded-xl border border-soft p-6 shadow-sm sticky top-6">
+            <h2 className="font-display text-lg text-dark mb-4 pb-4 border-b border-soft">Publish Settings</h2>
+            
+            <div className="space-y-5">
+              {/* Active Toggle */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-sm text-dark">Active Status</p>
+                  <p className="text-[11px] text-muted">Visible on store</p>
+                </div>
+                <button 
+                  type="button" 
+                  onClick={() => set('isActive', !form.isActive)}
+                  className={`w-12 h-6 rounded-full relative transition-colors duration-300 focus:outline-none ${form.isActive ? 'bg-green-500' : 'bg-gray-200'}`}
+                >
+                  <motion.div 
+                    layout 
+                    className="w-4 h-4 bg-white rounded-full shadow absolute top-1"
+                    initial={false}
+                    animate={{ left: form.isActive ? 28 : 4 }}
+                  />
+                </button>
+              </div>
+
+              {/* Featured Toggle */}
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="font-medium text-sm text-dark">Featured Product</p>
+                  <p className="text-[11px] text-muted">Show on homepage</p>
+                </div>
+                <button 
+                  type="button" 
+                  onClick={() => set('isFeatured', !form.isFeatured)}
+                  className={`w-12 h-6 rounded-full relative transition-colors duration-300 focus:outline-none ${form.isFeatured ? 'bg-warm' : 'bg-gray-200'}`}
+                >
+                  <motion.div 
+                    layout 
+                    className="w-4 h-4 bg-white rounded-full shadow absolute top-1"
+                    initial={false}
+                    animate={{ left: form.isFeatured ? 28 : 4 }}
+                  />
+                </button>
+              </div>
             </div>
 
-            {/* Tags */}
-            <div className="bg-white rounded-sm border border-soft p-6">
-              <h2 className="font-display text-lg mb-4 pb-3 border-b border-soft">Tags</h2>
-              <div className="flex flex-wrap gap-2 mb-3">
+            {/* Quick Summary */}
+            <div className="mt-6 pt-6 border-t border-soft">
+              <div className="space-y-2 text-xs">
+                <div className="flex justify-between text-muted">
+                  <span>Images</span>
+                  <span className="font-medium text-dark">{form.images.length}</span>
+                </div>
+                <div className="flex justify-between text-muted">
+                  <span>Sizes</span>
+                  <span className="font-medium text-dark">{form.sizes.length}</span>
+                </div>
+                <div className="flex justify-between text-muted">
+                  <span>Colors</span>
+                  <span className="font-medium text-dark">{form.colors.length}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="mt-6 space-y-3">
+              <button 
+                type="submit" 
+                disabled={loading}
+                className="btn-primary w-full py-3 text-sm flex items-center justify-center gap-2 group hover:shadow-lg transform transition-all active:scale-[0.98]"
+              >
+                {loading ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"/> : <FiSave size={16}/>}
+                <span>{isEdit ? 'Update Product' : 'Save Product'}</span>
+              </button>
+              
+              <Link 
+                to="/admin/products"
+                className="w-full py-3 text-sm text-muted font-medium border border-transparent hover:border-soft rounded-lg flex items-center justify-center transition-all hover:bg-gray-50"
+              >
+                Cancel
+              </Link>
+            </div>
+          </motion.div>
+
+          {/* Tags Section */}
+          <motion.div variants={itemVariants} className="bg-white rounded-xl border border-soft p-6 shadow-sm">
+            <h2 className="font-display text-lg text-dark mb-4">Product Tags</h2>
+            <div className="relative mb-3">
+               <input 
+                  value={tagInput} 
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={addTag}
+                  className="w-full bg-gray-50 border border-soft rounded-lg px-3 py-2 text-sm focus:border-warm focus:outline-none" 
+                  placeholder="Type tag & enter..."
+                />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <AnimatePresence>
                 {form.tags.map((tag) => (
-                  <span key={tag} className="flex items-center gap-1.5 bg-soft text-dark text-xs px-3 py-1 rounded-full">
+                  <motion.span 
+                    key={tag}
+                    initial={{ scale: 0 }} animate={{ scale: 1 }} exit={{ scale: 0 }}
+                    className="inline-flex items-center gap-1.5 bg-warm/10 text-warm text-[10px] font-bold uppercase tracking-wide px-2.5 py-1 rounded-full border border-warm/20"
+                  >
                     {tag}
-                    <button type="button" onClick={() => set('tags', form.tags.filter((t) => t !== tag))}>
-                      <FiX size={10}/>
+                    <button type="button" onClick={() => set('tags', form.tags.filter(t => t !== tag))}>
+                      <FiX size={10} className="hover:text-red-500 transition-colors"/>
                     </button>
-                  </span>
+                  </motion.span>
                 ))}
-              </div>
-              <input value={tagInput} onChange={(e) => setTagInput(e.target.value)}
-                onKeyDown={addTag}
-                className="input-field text-sm" placeholder="Type a tag and press Enter (e.g. summer, casual, linen)"/>
+              </AnimatePresence>
+              {form.tags.length === 0 && <span className="text-xs text-muted italic">No tags added</span>}
             </div>
-          </div>
-
-          {/* ── RIGHT COL: Settings ── */}
-          <div className="space-y-5">
-
-            {/* Status */}
-            <div className="bg-white rounded-sm border border-soft p-5">
-              <h2 className="font-display text-lg mb-4 pb-3 border-b border-soft">Status</h2>
-              <div className="space-y-3">
-                <label className="flex items-center justify-between cursor-pointer">
-                  <span>
-                    <p className="text-sm font-medium">Active</p>
-                    <p className="text-xs text-muted">Visible on shop page</p>
-                  </span>
-                  <button type="button" onClick={() => set('isActive', !form.isActive)}
-                    className={`relative w-11 h-6 rounded-full transition-colors ${form.isActive ? 'bg-green-500' : 'bg-gray-200'}`}>
-                    <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform
-                      ${form.isActive ? 'translate-x-5' : ''}`}/>
-                  </button>
-                </label>
-                <label className="flex items-center justify-between cursor-pointer">
-                  <span>
-                    <p className="text-sm font-medium">Featured</p>
-                    <p className="text-xs text-muted">Show on homepage</p>
-                  </span>
-                  <button type="button" onClick={() => set('isFeatured', !form.isFeatured)}
-                    className={`relative w-11 h-6 rounded-full transition-colors ${form.isFeatured ? 'bg-warm' : 'bg-gray-200'}`}>
-                    <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform
-                      ${form.isFeatured ? 'translate-x-5' : ''}`}/>
-                  </button>
-                </label>
-              </div>
-            </div>
-
-            {/* Summary Card */}
-            <div className="bg-white rounded-sm border border-soft p-5">
-              <h2 className="font-display text-lg mb-4 pb-3 border-b border-soft">Summary</h2>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-muted">Category</span>
-                  <span className="font-medium">{form.category || '—'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted">Price</span>
-                  <span className="font-medium">{form.price ? `₹${Number(form.price).toLocaleString()}` : '—'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted">Stock</span>
-                  <span className="font-medium">{form.stockQuantity || '—'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted">Sizes</span>
-                  <span className="font-medium">{form.sizes.length > 0 ? form.sizes.join(', ') : '—'}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-muted">Images</span>
-                  <span className="font-medium">{form.images.length} added</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Save Button */}
-            <button type="submit" disabled={loading}
-              className="btn-primary w-full justify-center py-3.5 disabled:opacity-60">
-              {loading ? (
-                <span className="flex items-center gap-2">
-                  <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"/>
-                  Saving...
-                </span>
-              ) : (
-                <><FiSave size={15}/> {isEdit ? 'Update Product' : 'Save Product'}</>
-              )}
-            </button>
-            <Link to="/admin/products"
-              className="btn-outline w-full justify-center py-3 text-xs">
-              Cancel
-            </Link>
-          </div>
+          </motion.div>
         </div>
       </form>
-    </div>
+    </motion.div>
   );
 }
