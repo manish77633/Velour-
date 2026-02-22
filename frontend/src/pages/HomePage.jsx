@@ -5,6 +5,7 @@ import { fetchProducts } from '../redux/slices/productSlice';
 import ProductCard from '../components/product/ProductCard';
 import { ProductGridSkeleton } from '../components/common/Loader';
 import { FiArrowRight, FiTruck, FiRefreshCw, FiShield, FiStar } from 'react-icons/fi';
+import TestimonialsMarquee from '../components/TestimonialsMarquee';
 
 const CATEGORIES = [
   { 
@@ -186,7 +187,7 @@ export default function HomePage() {
 </section>
 
       {/* ── FEATURED PRODUCTS ── */}
-      <section className="py-20 bg-soft">
+      <section className="py-20 bg-soft ">
         <div className="max-w-screen-xl mx-auto px-6">
           <div className="flex justify-between items-end mb-10">
             <div>
@@ -212,7 +213,28 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* ── SALE BANNER ── */}
+
+      <TestimonialsMarquee />
+
+      {/* ── VALUE PROPS ── */}
+      <section className="py-16 bg-cream border-t border-soft">
+        <div className="max-w-screen-xl mx-auto px-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            {VALUE_PROPS.map(({ icon: Icon, title, desc }) => (
+              <div key={title} className="flex flex-col items-center text-center gap-3">
+                <div className="w-12 h-12 rounded-full bg-soft flex items-center justify-center">
+                  <Icon size={20} className="text-warm" />
+                </div>
+                <div>
+                  <p className="font-medium text-sm text-dark mb-0.5">{title}</p>
+                  <p className="text-xs text-muted">{desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+            {/* ── SALE BANNER ── */}
       <section className="py-5 px-6">
         <div className="max-w-screen-xl mx-auto">
           <div className="bg-dark rounded-sm px-8 md:px-14 py-12 grid grid-cols-1 md:grid-cols-2 gap-8 items-center relative overflow-hidden">
@@ -250,25 +272,6 @@ export default function HomePage() {
     />
   </div>
 </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ── VALUE PROPS ── */}
-      <section className="py-16 bg-cream border-t border-soft">
-        <div className="max-w-screen-xl mx-auto px-6">
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
-            {VALUE_PROPS.map(({ icon: Icon, title, desc }) => (
-              <div key={title} className="flex flex-col items-center text-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-soft flex items-center justify-center">
-                  <Icon size={20} className="text-warm" />
-                </div>
-                <div>
-                  <p className="font-medium text-sm text-dark mb-0.5">{title}</p>
-                  <p className="text-xs text-muted">{desc}</p>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>

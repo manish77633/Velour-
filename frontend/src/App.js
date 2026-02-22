@@ -19,6 +19,7 @@ import LoginPage         from './pages/LoginPage';
 import ProfilePage       from './pages/ProfilePage';
 import AuthSuccessPage   from './pages/AuthSuccessPage';
 import ProtectedRoute    from './components/auth/ProtectedRoute';
+import AboutPage from './pages/AboutPage';
 
 import AdminDashboard   from './pages/admin/AdminDashboard';
 import AdminProducts    from './pages/admin/AdminProducts';
@@ -64,6 +65,7 @@ function App() {
               <Route path="/cart"          element={<CartPage/>}/>
               <Route path="/login"         element={<LoginPage/>}/>
               <Route path="/auth/success"  element={<AuthSuccessPage/>}/>
+              <Route path="/about"         element={<AboutPage />} />
               <Route element={<ProtectedRoute/>}>
                 <Route path="/checkout"          element={<CheckoutPage/>}/>
                 <Route path="/order-success/:id" element={<OrderSuccessPage/>}/>

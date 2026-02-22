@@ -46,6 +46,7 @@ const Navbar = () => {
     { label: 'Women',        to: '/shop?category=Women' },
     { label: 'Kids',         to: '/shop?category=Kids' },
     { label: 'Sale',         to: '/shop?sort=price_low' },
+    { label: 'About',         to: '/about' },
   ];
 
   return (

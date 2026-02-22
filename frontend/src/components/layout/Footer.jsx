@@ -73,7 +73,7 @@ const Footer = () => {
         {/* Bottom */}
         <div className="border-t border-cream/10 pt-8 flex flex-col md:flex-row justify-between items-center gap-4">
           <p className="text-xs text-cream/35 text-center md:text-left">
-            © 2025 <span className="text-cream/60 font-medium">Manish Kumar</span>. All rights reserved. Built with ❤️ in India.
+            © 2026 <span className="text-cream/60 font-medium">Manish Kumar</span>. All rights reserved. Built with ❤️ in India.
           </p>
           <div className="flex gap-5">
             {['Privacy Policy','Terms of Service','MIT License'].map((item) => (
