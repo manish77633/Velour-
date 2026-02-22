@@ -9,6 +9,7 @@ import Navbar      from './components/layout/Navbar';
 import Footer      from './components/layout/Footer';
 import CartDrawer  from './components/cart/CartDrawer';
 import AdminLayout from './components/layout/AdminLayout';
+import AdminUsers from './pages/admin/AdminUsers';
 
 import HomePage          from './pages/HomePage';
 import ShopPage          from './pages/ShopPage';
@@ -46,8 +47,11 @@ function App() {
           <Route path="products/new"      element={<AdminProductForm/>}/>
           <Route path="products/:id/edit" element={<AdminProductForm/>}/>
           <Route path="orders"            element={<AdminOrders/>}/>
-          <Route path="orders/:id"         element={<AdminOrderDetail/>}/>
-          <Route path="users" element={
+          <Route path="orders/:id"        element={<AdminOrderDetail/>}/>
+          <Route path="/admin/users"      element={<AdminUsers />} />
+
+          
+          <Route path="users"  element={
             <div className="bg-white rounded-sm border border-soft p-8 text-center">
               <p className="font-display text-2xl mb-2">Users Management</p>
               <p className="text-muted text-sm">Coming soon.</p>

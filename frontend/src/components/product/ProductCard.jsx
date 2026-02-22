@@ -90,7 +90,7 @@ const ProductCard = ({ product }) => {
       {/* Info */}
       <div>
         <p className="text-[10px] tracking-[0.18em] uppercase text-muted mb-0.5">{product.category}</p>
-        <h3 className="text-sm font-medium text-dark leading-snug mb-1 line-clamp-1">{product.name}</h3>
+        <h3 className="text-sm font-medium text-cream leading-snug mb-1 line-clamp-1">{product.name}</h3>
 
         {/* Rating */}
         <div className="flex items-center gap-1 mb-1.5">
@@ -105,7 +105,7 @@ const ProductCard = ({ product }) => {
 
         {/* Price */}
         <div className="flex items-center gap-2">
-          <span className="text-sm font-semibold text-dark">{formatPrice(product.price)}</span>
+          <span className="text-sm font-semibold text-cream">{formatPrice(product.price)}</span>
           {product.originalPrice && product.originalPrice > product.price && (
             <span className="text-xs text-muted line-through">{formatPrice(product.originalPrice)}</span>
           )}

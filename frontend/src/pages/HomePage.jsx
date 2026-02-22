@@ -50,7 +50,7 @@ export default function HomePage() {
   }, [dispatch]);
 
   return (
-    <main className="pt-16 overflow-hidden" style={{ backgroundColor: '#1C1917' }}>
+    <main className="pt-16 overflow-x-hidden w-full max-w-[100vw]" style={{ backgroundColor: '#1C1917' }}>
       
       {/* Premium Font Injection */}
       <style>{`
@@ -138,8 +138,9 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════
           CATEGORIES — Light Cream Theme (#FAF7F2) 🤍
       ══════════════════════════════════════════════ */}
+      {/* 💡 FIX: viewport={{ once: true }} */}
       <motion.section 
-        initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.2 }} variants={staggerContainer}
+        initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer}
         className="py-24 md:py-32 overflow-hidden" style={{ background: '#FAF7F2' }}
       >
         <div className="max-w-screen-xl mx-auto px-4 md:px-6">
@@ -164,7 +165,6 @@ export default function HomePage() {
                 <Link to={`/shop?category=${cat.query}`} className="group relative overflow-hidden rounded-sm cursor-pointer block h-[400px] md:h-[500px] shadow-sm hover:shadow-2xl transition-shadow duration-500">
                   <img src={cat.image} alt={cat.label} className="absolute inset-0 w-full h-full object-cover origin-center transition-transform duration-[1.5s] group-hover:scale-105" />
                   
-                  {/* Keep dark overlay inside image so white text is readable */}
                   <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors duration-500 z-10" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 z-10" />
 
@@ -189,8 +189,9 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════
           FEATURED PRODUCTS — Muted Dark (#23201E) 🖤
       ══════════════════════════════════════════════ */}
+      {/* 💡 FIX: viewport={{ once: true }} ensures products load correctly on mobile */}
       <motion.section 
-        initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.2 }} variants={staggerContainer}
+        initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer}
         className="py-24 md:py-32" style={{ background: '#23201E' }}
       >
         <div className="max-w-screen-xl mx-auto px-4 md:px-6">
@@ -209,7 +210,6 @@ export default function HomePage() {
           {loading ? (
             <ProductGridSkeleton count={8} />
           ) : (
-            // Responsive: 1 Col on Mobile, 2 on Tablet, 4 on Desktop
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {products.map((p) => (
                 <motion.div key={p._id} variants={fadeUpItem}>
@@ -235,15 +235,17 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════
           TESTIMONIALS (Dark background continuity)
       ══════════════════════════════════════════════ */}
-      <motion.div initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.2 }} variants={fadeUpItem}>
+      {/* 💡 FIX: viewport={{ once: true }} */}
+      <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={fadeUpItem}>
         <TestimonialsMarquee />
       </motion.div>
 
       {/* ══════════════════════════════════════════════
           VALUE PROPS — Warm Off-White (#EDE8DF) 🤍
       ══════════════════════════════════════════════ */}
+      {/* 💡 FIX: viewport={{ once: true }} */}
       <motion.section 
-        initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.2 }} variants={staggerContainer}
+        initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer}
         className="py-16 md:py-24" style={{ background: '#EDE8DF' }}
       >
         <div className="max-w-screen-xl mx-auto px-4 md:px-6">
@@ -266,8 +268,9 @@ export default function HomePage() {
       {/* ══════════════════════════════════════════════
           SALE BANNER — Deep Dark Theme (#1C1917) 🖤
       ══════════════════════════════════════════════ */}
+      {/* 💡 FIX: viewport={{ once: true }} */}
       <motion.section 
-        initial="hidden" whileInView="visible" viewport={{ once: false, amount: 0.2 }} variants={staggerContainer}
+        initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer}
         className="py-16 md:py-24 px-4 md:px-6" style={{ background: '#1C1917' }}
       >
         <div className="max-w-screen-xl mx-auto">

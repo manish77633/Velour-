@@ -27,20 +27,17 @@ const updateProfile = async (req, res) => {
 const changePassword = async (req, res) => {
   const { currentPassword, newPassword } = req.body;
   
-  // User ko password field ke saath fetch karein
   const user = await User.findById(req.user._id).select('+password');
 
   if (!user.password) {
     return res.status(400).json({ success: false, message: 'No password set. You use Google Login.' });
   }
 
-  // Check Current Password
   const isMatch = await user.matchPassword(currentPassword);
   if (!isMatch) {
     return res.status(400).json({ success: false, message: 'Incorrect current password' });
   }
 
-  // Set New Password
   user.password = newPassword;
   await user.save();
   res.json({ success: true, message: 'Password updated successfully' });
@@ -55,18 +52,14 @@ const forgotPassword = async (req, res) => {
     return res.status(404).json({ success: false, message: 'User not found' });
   }
 
-  // Token Generate karein
   const resetToken = crypto.randomBytes(20).toString('hex');
 
-  // Token ko hash karke Database me save karein
   user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-  user.resetPasswordExpire = Date.now() + 15 * 60 * 1000; // 15 Minutes validity
+  user.resetPasswordExpire = Date.now() + 15 * 60 * 1000; 
   await user.save();
 
-  // Email Link
   const resetUrl = `${process.env.CLIENT_URL}/reset-password/${resetToken}`;
 
-  // Nodemailer Setup
   const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -119,7 +112,7 @@ const resetPassword = async (req, res) => {
   res.status(200).json({ success: true, message: 'Password reset successful' });
 };
 
-// Other controllers...
+// 6. Address & Wishlist
 const addAddress = async (req, res) => {
   const user = await User.findById(req.user._id);
   if (req.body.isDefault) user.addresses.forEach(a => a.isDefault = false);
@@ -144,13 +137,67 @@ const toggleWishlist = async (req, res) => {
   res.json({ success: true, wishlist: user.wishlist });
 };
 
+// ==========================================
+// ADMIN CONTROLLERS (New Updates)
+// ==========================================
+
 const getAllUsers = async (req, res) => {
   const users = await User.find({}).select('-password').sort({ createdAt: -1 });
   res.json({ success: true, users });
 };
 
+// User ko Delete karna (Admin ke liye)
+const deleteUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (user) {
+      if (user.isAdmin) {
+        return res.status(400).json({ success: false, message: 'Cannot delete an Admin user' });
+      }
+      await User.findByIdAndDelete(req.params.id);
+      res.status(200).json({ success: true, message: 'User removed completely' });
+    } else {
+      res.status(404).json({ success: false, message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server Error: Could not delete user' });
+  }
+};
+
+// User ka Role Update karna (Admin ke liye)
+const updateUser = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+
+    if (user) {
+      user.name = req.body.name || user.name;
+      user.email = req.body.email || user.email;
+      
+      if (req.body.isAdmin !== undefined) {
+        user.isAdmin = req.body.isAdmin;
+      }
+
+      const updatedUser = await user.save();
+
+      res.status(200).json({
+        success: true,
+        _id: updatedUser._id,
+        name: updatedUser.name,
+        email: updatedUser.email,
+        isAdmin: updatedUser.isAdmin,
+      });
+    } else {
+      res.status(404).json({ success: false, message: 'User not found' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Server Error: Could not update user' });
+  }
+};
+
 module.exports = {
   getProfile, updateProfile, changePassword,
   forgotPassword, resetPassword,
-  addAddress, deleteAddress, toggleWishlist, getAllUsers
+  addAddress, deleteAddress, toggleWishlist, 
+  getAllUsers, deleteUser, updateUser // <-- Exports updated
 };
