@@ -20,7 +20,7 @@ const staggerContainer = {
 const fadeUpItem = {
   hidden: { opacity: 0, y: 50 },
   visible: {
-    opacity: 1, 
+    opacity: 1,
     y: 0,
     transition: { duration: 0.8, ease: [0.22, 1, 0.36, 1] }
   }
@@ -51,7 +51,7 @@ export default function HomePage() {
 
   return (
     <main className="pt-16 overflow-x-hidden w-full max-w-[100vw]" style={{ backgroundColor: '#1C1917' }}>
-      
+
       {/* Premium Font Injection */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&family=DM+Sans:wght@200;300;400;500&display=swap');
@@ -63,11 +63,11 @@ export default function HomePage() {
           HERO — Deep Dark Luxury (Steady)
       ══════════════════════════════════════════════ */}
       <section className="min-h-screen relative flex items-center py-20 overflow-hidden" style={{ background: 'linear-gradient(160deg, #1C1917 0%, #12100F 100%)' }}>
-        
+
         <div className="absolute inset-0 pointer-events-none">
           <svg className="absolute inset-0 w-full h-full opacity-30" xmlns="http://www.w3.org/2000/svg">
-            <defs><pattern id="g-dark" width="56" height="56" patternUnits="userSpaceOnUse"><path d="M 56 0 L 0 0 0 56" fill="none" stroke="rgba(196,168,130,0.05)" strokeWidth="0.6"/></pattern></defs>
-            <rect width="100%" height="100%" fill="url(#g-dark)"/>
+            <defs><pattern id="g-dark" width="56" height="56" patternUnits="userSpaceOnUse"><path d="M 56 0 L 0 0 0 56" fill="none" stroke="rgba(196,168,130,0.05)" strokeWidth="0.6" /></pattern></defs>
+            <rect width="100%" height="100%" fill="url(#g-dark)" />
           </svg>
           <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full blur-[120px] pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(196,168,130,0.12) 0%, transparent 70%)' }} />
           <div className="absolute bottom-1/4 right-1/4 w-64 h-64 rounded-full blur-[100px] pointer-events-none" style={{ background: 'radial-gradient(circle, rgba(196,168,130,0.08) 0%, transparent 70%)' }} />
@@ -79,25 +79,32 @@ export default function HomePage() {
               <span className="w-8 h-px" style={{ background: '#C4A882' }} />
               New Collection 2026
             </motion.p>
-            
+
             <motion.h1 variants={fadeUpItem} className="text-5xl md:text-6xl lg:text-7xl font-light leading-[1.05] mb-6" style={{ color: '#FAF7F2', fontFamily: 'Cormorant Garamond, serif' }}>
               Dress with<br />
               <em className="italic pr-2" style={{ color: '#C4A882' }}>Purpose</em><br />
               & Precision
             </motion.h1>
-            
+
             <motion.p variants={fadeUpItem} className="text-sm md:text-base leading-relaxed mb-8 max-w-md mx-auto lg:mx-0" style={{ color: '#A3968A', fontWeight: 300 }}>
               Curated fashion for Men, Women & Kids. Premium fabrics, timeless silhouettes, and designs that speak without words.
             </motion.p>
-            
+
             <motion.div variants={fadeUpItem} className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
-              <Link to="/shop" className="relative overflow-hidden inline-flex items-center justify-center py-4 px-8 rounded-sm transition-all duration-300 group hover:scale-105" style={{ background: '#C4A882', color: '#1C1917' }}>
-                <span className="absolute inset-0 w-[150%] h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 pointer-events-none group-hover:animate-[shine_1.5s_infinite]" />
-                <span className="relative z-10 flex items-center gap-2.5 text-xs tracking-widest uppercase font-bold">
-                  Shop Collection
-                  <FiArrowRight size={16} />
-                </span>
-              </Link>
+<Link 
+  to="/shop" 
+  className="group relative inline-flex items-center justify-center overflow-hidden rounded-sm bg-[#C4A882] px-10 py-4 font-bold text-[#1C1917] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(196,168,130,0.4)]"
+>
+  {/* ✨ FLASH EFFECT LAYER ✨ */}
+  {/* Ye initially left side me chhupa hai (-left-[100%]), hover krne par right side (+left-[100%]) bhaagega */}
+  <div className="absolute top-0 -left-[100%] h-full w-full -skew-x-12 bg-gradient-to-r from-transparent via-white/50 to-transparent transition-all duration-700 ease-in-out group-hover:left-[100%]" />
+
+  {/* TEXT & ICON CONTENT */}
+  <span className="relative z-10 flex items-center gap-2.5 text-xs uppercase tracking-[0.2em]">
+    Shop Collection
+    <FiArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
+  </span>
+</Link>
               <Link to="/shop?category=Women" className="relative overflow-hidden inline-flex items-center justify-center py-4 px-8 rounded-sm transition-all duration-300 group hover:scale-105 border" style={{ borderColor: 'rgba(196,168,130,0.3)', color: '#FAF7F2' }}>
                 <span className="absolute inset-0 bg-[#C4A882] opacity-0 group-hover:opacity-10 transition-opacity duration-300" />
                 <span className="relative z-10 flex items-center gap-2.5 text-xs tracking-widest uppercase font-bold">
@@ -139,12 +146,12 @@ export default function HomePage() {
           CATEGORIES — Light Cream Theme (#FAF7F2) 🤍
       ══════════════════════════════════════════════ */}
       {/* 💡 FIX: viewport={{ once: true }} */}
-      <motion.section 
+      <motion.section
         initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer}
         className="py-24 md:py-32 overflow-hidden" style={{ background: '#FAF7F2' }}
       >
         <div className="max-w-screen-xl mx-auto px-4 md:px-6">
-          
+
           <motion.div variants={fadeUpItem} className="flex justify-between items-end mb-12">
             <div>
               <div className="flex items-center gap-3 mb-3">
@@ -154,7 +161,7 @@ export default function HomePage() {
               <h2 className="text-4xl md:text-5xl font-light tracking-tight" style={{ color: '#1C1917', fontFamily: 'Cormorant Garamond, serif' }}>Shop by Category</h2>
             </div>
             <Link to="/shop" className="hidden md:flex items-center gap-2 text-xs font-bold tracking-[0.2em] uppercase transition-colors group" style={{ color: '#6A5848' }}>
-              <span className="group-hover:text-[#1C1917] transition-colors">View All</span> 
+              <span className="group-hover:text-[#1C1917] transition-colors">View All</span>
               <span className="transform transition-all duration-300 group-hover:translate-x-1 group-hover:text-[#1C1917]"><FiArrowRight size={14} /></span>
             </Link>
           </motion.div>
@@ -164,7 +171,7 @@ export default function HomePage() {
               <motion.div key={cat.label} variants={fadeUpItem}>
                 <Link to={`/shop?category=${cat.query}`} className="group relative overflow-hidden rounded-sm cursor-pointer block h-[400px] md:h-[500px] shadow-sm hover:shadow-2xl transition-shadow duration-500">
                   <img src={cat.image} alt={cat.label} className="absolute inset-0 w-full h-full object-cover origin-center transition-transform duration-[1.5s] group-hover:scale-105" />
-                  
+
                   <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-colors duration-500 z-10" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-90 z-10" />
 
@@ -190,22 +197,24 @@ export default function HomePage() {
           FEATURED PRODUCTS — Muted Dark (#23201E) 🖤
       ══════════════════════════════════════════════ */}
       {/* 💡 FIX: viewport={{ once: true }} ensures products load correctly on mobile */}
-      <motion.section 
+      <motion.section
         initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer}
         className="py-24 md:py-32" style={{ background: '#23201E' }}
       >
         <div className="max-w-screen-xl mx-auto px-4 md:px-6">
-          
+
           <motion.div variants={fadeUpItem} className="flex justify-between items-end mb-12">
             <div>
               <p className="text-[10px] tracking-[0.3em] uppercase font-bold mb-3" style={{ color: '#C4A882' }}>Trending Now</p>
               <h2 className="text-4xl md:text-5xl font-light" style={{ color: '#FAF7F2', fontFamily: 'Cormorant Garamond, serif' }}>New Arrivals</h2>
             </div>
             <Link to="/shop" className="hidden md:flex items-center gap-2 text-xs font-bold tracking-[0.2em] uppercase transition-colors group" style={{ color: '#A3968A' }}>
-              <span className="group-hover:text-[#C4A882] transition-colors">See All</span> 
+              <span className="group-hover:text-[#C4A882] transition-colors">See All</span>
               <span className="transform transition-all duration-300 group-hover:translate-x-1 group-hover:text-[#C4A882]"><FiArrowRight size={13} /></span>
             </Link>
           </motion.div>
+
+          {/* Inside HomePage.jsx inside the Featured Products Section */}
 
           {loading ? (
             <ProductGridSkeleton count={8} />
@@ -213,20 +222,28 @@ export default function HomePage() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {products.map((p) => (
                 <motion.div key={p._id} variants={fadeUpItem}>
-                  <ProductCard product={p} />
+                  {/* 👇 Yahan 'isDark={true}' pass kiya */}
+                  <ProductCard product={p} isDark={true} />
                 </motion.div>
               ))}
             </div>
           )}
 
           <motion.div variants={fadeUpItem} className="text-center mt-12">
-            <Link to="/shop" className="relative overflow-hidden inline-flex items-center justify-center py-4 px-10 rounded-sm transition-all duration-300 group hover:scale-105" style={{ background: '#C4A882', color: '#1C1917' }}>
-              <span className="absolute inset-0 w-[150%] h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 pointer-events-none group-hover:animate-[shine_1.5s_infinite]" />
-              <span className="relative z-10 flex items-center gap-2.5 text-xs tracking-widest uppercase font-bold">
-                Shop All Products
-                <FiArrowRight size={16} />
-              </span>
-            </Link>
+<Link 
+  to="/shop" 
+  className="group relative inline-flex items-center justify-center overflow-hidden rounded-sm bg-[#C4A882] px-10 py-4 font-bold text-[#1C1917] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(196,168,130,0.4)]"
+>
+  {/* ✨ FLASH EFFECT LAYER ✨ */}
+  {/* Ye initially left side me chhupa hai (-left-[100%]), hover krne par right side (+left-[100%]) bhaagega */}
+  <div className="absolute top-0 -left-[100%] h-full w-full -skew-x-12 bg-gradient-to-r from-transparent via-white/50 to-transparent transition-all duration-700 ease-in-out group-hover:left-[100%]" />
+
+  {/* TEXT & ICON CONTENT */}
+  <span className="relative z-10 flex items-center gap-2.5 text-xs uppercase tracking-[0.2em]">
+    Shop All Products
+    <FiArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
+  </span>
+</Link>
           </motion.div>
 
         </div>
@@ -244,7 +261,7 @@ export default function HomePage() {
           VALUE PROPS — Warm Off-White (#EDE8DF) 🤍
       ══════════════════════════════════════════════ */}
       {/* 💡 FIX: viewport={{ once: true }} */}
-      <motion.section 
+      <motion.section
         initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer}
         className="py-16 md:py-24" style={{ background: '#EDE8DF' }}
       >
@@ -269,17 +286,17 @@ export default function HomePage() {
           SALE BANNER — Deep Dark Theme (#1C1917) 🖤
       ══════════════════════════════════════════════ */}
       {/* 💡 FIX: viewport={{ once: true }} */}
-      <motion.section 
+      <motion.section
         initial="hidden" whileInView="visible" viewport={{ once: true }} variants={staggerContainer}
         className="py-16 md:py-24 px-4 md:px-6" style={{ background: '#1C1917' }}
       >
         <div className="max-w-screen-xl mx-auto">
           <motion.div variants={fadeUpItem} className="rounded-sm px-6 md:px-14 py-16 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center relative overflow-hidden" style={{ background: '#12100F', border: '1px solid rgba(196,168,130,0.15)' }}>
-            
+
             <div className="absolute inset-0 pointer-events-none">
               <div className="absolute right-0 top-0 w-64 h-64 rounded-full blur-[100px]" style={{ background: 'rgba(196,168,130,0.1)' }} />
             </div>
-            
+
             <div className="relative z-10 text-center lg:text-left">
               <p className="text-[10px] tracking-[0.25em] uppercase mb-4 font-bold" style={{ color: '#C4A882' }}>Limited Time Offer</p>
               <h2 className="text-4xl md:text-5xl font-light leading-tight mb-4" style={{ color: '#FAF7F2', fontFamily: 'Cormorant Garamond, serif' }}>
@@ -288,14 +305,21 @@ export default function HomePage() {
               <p className="text-sm mb-8 leading-relaxed max-w-sm mx-auto lg:mx-0" style={{ color: '#A3968A' }}>
                 Shop premium fashion at unbelievable prices. Limited stock — grab yours before it's gone.
               </p>
-              
-              <Link to="/shop" className="relative overflow-hidden inline-flex items-center justify-center py-4 px-8 rounded-sm transition-all duration-300 group hover:scale-105" style={{ background: '#C4A882', color: '#1C1917' }}>
-                <span className="absolute inset-0 w-[150%] h-full bg-gradient-to-r from-transparent via-white/30 to-transparent -skew-x-12 pointer-events-none group-hover:animate-[shine_1.5s_infinite]" />
-                <span className="relative z-10 flex items-center gap-2.5 text-xs tracking-widest uppercase font-bold">
-                  Shop The Sale
-                  <FiArrowRight size={16} />
-                </span>
-              </Link>
+
+<Link 
+  to="/shop" 
+  className="group relative inline-flex items-center justify-center overflow-hidden rounded-sm bg-[#C4A882] px-10 py-4 font-bold text-[#1C1917] transition-all duration-300 hover:scale-105 hover:shadow-[0_0_20px_rgba(196,168,130,0.4)]"
+>
+  {/* ✨ FLASH EFFECT LAYER ✨ */}
+  {/* Ye initially left side me chhupa hai (-left-[100%]), hover krne par right side (+left-[100%]) bhaagega */}
+  <div className="absolute top-0 -left-[100%] h-full w-full -skew-x-12 bg-gradient-to-r from-transparent via-white/50 to-transparent transition-all duration-700 ease-in-out group-hover:left-[100%]" />
+
+  {/* TEXT & ICON CONTENT */}
+  <span className="relative z-10 flex items-center gap-2.5 text-xs uppercase tracking-[0.2em]">
+    Shop the Sale
+    <FiArrowRight size={16} className="transition-transform duration-300 group-hover:translate-x-1" />
+  </span>
+</Link>
             </div>
 
             <div className="hidden lg:grid grid-cols-2 gap-4 relative z-10">
@@ -306,7 +330,7 @@ export default function HomePage() {
                 <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=600&q=80" alt="Summer Sale Women" className="w-full h-full object-cover grayscale-[20%] hover:grayscale-0 transition-all duration-500" />
               </div>
             </div>
-            
+
           </motion.div>
         </div>
       </motion.section>

@@ -3,8 +3,9 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../../services/api';
 import { formatPrice } from '../../utils/formatPrice';
-import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiStar, FiAlertTriangle, FiFilter, FiX } from 'react-icons/fi';
+import { FiPlus, FiEdit2, FiTrash2, FiSearch, FiStar, FiAlertTriangle, FiFilter, FiX, FiMoreVertical } from 'react-icons/fi';
 import toast from 'react-hot-toast';
+import { motion } from 'framer-motion';
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
@@ -12,8 +13,9 @@ export default function AdminProducts() {
   const [search,   setSearch]   = useState('');
   const [catFilter,setCatFilter]= useState('');
   const [total,    setTotal]    = useState(0);
-  const [page,     setPage]     = useState(1);
-  const [delId,    setDelId]    = useState(null); // confirm delete
+  const [page,      setPage]     = useState(1);
+  const [delId,    setDelId]    = useState(null); 
+  const [activeMenu, setActiveMenu] = useState(null);
 
   const loadProducts = useCallback(async () => {
     setLoading(true);
@@ -30,6 +32,12 @@ export default function AdminProducts() {
 
   useEffect(() => { loadProducts(); }, [loadProducts]);
 
+  useEffect(() => {
+    const handleClickOutside = () => setActiveMenu(null);
+    document.addEventListener('click', handleClickOutside);
+    return () => document.removeEventListener('click', handleClickOutside);
+  }, []);
+
   const handleDelete = async (id) => {
     try {
       await api.delete(`/products/${id}`);
@@ -42,282 +50,193 @@ export default function AdminProducts() {
   const totalPages = Math.ceil(total / 10);
 
   return (
-    <div className="animate-fade-in">
-      {/* Internal CSS for smooth custom animations */}
+    <div className="animate-fade-in p-2 sm:p-6 lg:p-8 max-w-7xl mx-auto">
       <style>{`
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-        @keyframes slideUpFade {
-          from { opacity: 0; transform: translateY(15px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
-        @keyframes scaleIn {
-          from { opacity: 0; transform: scale(0.95); }
-          to { opacity: 1; transform: scale(1); }
-        }
-        .animate-fade-in { animation: fadeIn 0.5s ease-out forwards; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUpFade { from { opacity: 0; transform: translateY(15px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes scaleIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
+        .animate-fade-in { animation: fadeIn 0.6s ease-out forwards; }
         .animate-slide-up { animation: slideUpFade 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards; opacity: 0; }
         .animate-scale-in { animation: scaleIn 0.3s ease-out forwards; }
+        .custom-scrollbar::-webkit-scrollbar { height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 4px; }
       `}</style>
 
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-8 gap-4">
+      {/* Header Section */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-6 sm:mb-8 gap-4 animate-slide-up" style={{ animationDelay: '0.1s' }}>
         <div>
-          <h1 className="font-display text-3xl font-normal text-dark">Products</h1>
-          <p className="text-sm text-muted mt-1 font-light tracking-wide">{total} products found</p>
+          <h1 className="font-display text-3xl md:text-4xl font-normal text-[#1C1917] tracking-tight">Products</h1>
+          <p className="text-sm text-gray-500 mt-1 font-light tracking-wide">{total} products in inventory</p>
         </div>
         <Link 
           to="/admin/products/new" 
-          className="btn-primary inline-flex items-center gap-2 group transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 active:scale-95"
+          className="bg-[#1C1917] text-white px-8 py-3 rounded-sm text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg hover:bg-black transition-all active:scale-95"
         >
-          <FiPlus size={18} className="transition-transform group-hover:rotate-90"/> 
-          <span>Add Product</span>
+          <FiPlus size={16} /> <span>Add Product</span>
         </Link>
       </div>
 
       {/* Filters Bar */}
-      <div className="bg-white rounded-sm border border-soft p-1.5 mb-6 flex flex-col md:flex-row gap-2 shadow-sm">
-        {/* Search */}
-        <div className="relative flex-1 group">
-          <FiSearch size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted group-focus-within:text-warm transition-colors"/>
+      <div className="bg-white rounded-md border border-[#E5E5E5] p-3 mb-6 flex flex-col md:flex-row gap-3 shadow-sm animate-slide-up" style={{ animationDelay: '0.2s' }}>
+        <div className="relative flex-1">
+          <FiSearch size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"/>
           <input 
             type="text" 
-            placeholder="Search products by name..." 
+            placeholder="Search products..." 
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-            className="w-full pl-10 pr-4 py-2.5 text-sm bg-transparent outline-none text-dark placeholder:text-muted/70 transition-all"
+            className="w-full pl-11 pr-4 py-2.5 text-sm bg-gray-50/50 rounded-sm border border-transparent focus:bg-white focus:border-[#C4A882] outline-none transition-all"
           />
         </div>
 
-        <div className="h-px md:h-8 w-full md:w-px bg-soft my-auto mx-1 hidden md:block"></div>
-
-        {/* Category Select */}
-        <div className="relative min-w-[180px]">
-          <FiFilter size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted pointer-events-none"/>
+        <div className="flex gap-2">
           <select 
             value={catFilter} 
             onChange={(e) => { setCatFilter(e.target.value); setPage(1); }}
-            className="w-full pl-9 pr-8 py-2.5 text-sm bg-transparent outline-none cursor-pointer text-dark hover:bg-gray-50 transition-colors appearance-none"
+            className="pl-4 pr-10 py-2.5 text-sm bg-gray-50/50 border border-transparent focus:bg-white focus:border-[#C4A882] rounded-sm outline-none cursor-pointer appearance-none"
           >
             <option value="">All Categories</option>
-            <option value="Men">Men</option>
-            <option value="Women">Women</option>
-            <option value="Kids">Kids</option>
-            <option value="Accessories">Accessories</option>
+            {['Men', 'Women', 'Kids', 'Accessories'].map(cat => <option key={cat} value={cat}>{cat}</option>)}
           </select>
-          <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-muted"></div>
+          {(search || catFilter) && (
+            <button onClick={() => { setSearch(''); setCatFilter(''); setPage(1); }} className="px-4 text-red-500 bg-red-50 hover:bg-red-100 rounded-sm"><FiX size={18}/></button>
+          )}
         </div>
-
-        {/* Clear Button */}
-        {(search || catFilter) && (
-          <button 
-            onClick={() => { setSearch(''); setCatFilter(''); setPage(1); }}
-            className="flex items-center gap-1.5 px-4 py-2 text-xs font-medium text-red-500 bg-red-50 hover:bg-red-100 rounded-sm transition-all animate-fade-in"
-          >
-            <FiX size={12}/> Clear
-          </button>
-        )}
       </div>
 
-      {/* Table Container */}
-      <div className="bg-white rounded-sm border border-soft overflow-hidden shadow-sm">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm text-left">
-            <thead className="bg-gray-50/80 border-b border-soft">
+      {/* Products Table Container */}
+      <div className="bg-white rounded-md border border-[#E5E5E5] overflow-visible shadow-sm animate-slide-up" style={{ animationDelay: '0.3s' }}>
+        <div className="overflow-x-auto custom-scrollbar pb-4">
+          <table className="w-full text-sm text-left border-separate border-spacing-0">
+            <thead className="bg-gray-50 border-b border-[#E5E5E5]">
               <tr>
-                {['Product','Category','Price','Stock','Rating','Actions'].map((h) => (
-                  <th key={h} className="px-5 py-4 text-xs tracking-[0.15em] uppercase font-medium text-muted">
-                    {h}
-                  </th>
-                ))}
+                <th className="px-6 py-4 text-[10px] tracking-[0.15em] uppercase font-bold text-gray-500">Product</th>
+                <th className="hidden md:table-cell px-6 py-4 text-[10px] tracking-[0.15em] uppercase font-bold text-gray-500">Category</th>
+                <th className="hidden md:table-cell px-6 py-4 text-[10px] tracking-[0.15em] uppercase font-bold text-gray-500">Price</th>
+                <th className="hidden md:table-cell px-6 py-4 text-[10px] tracking-[0.15em] uppercase font-bold text-gray-500">Stock</th>
+                <th className="hidden md:table-cell px-6 py-4 text-[10px] tracking-[0.15em] uppercase font-bold text-gray-500">Rating</th>
+                <th className="px-6 py-4 text-[10px] tracking-[0.15em] uppercase font-bold text-gray-500 text-right md:text-left">Actions</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-soft">
+            
+            <tbody className="divide-y divide-[#E5E5E5]">
               {loading ? (
-                [...Array(5)].map((_, i) => (
-                  <tr key={i} className="animate-pulse">
-                    <td className="px-5 py-4"><div className="flex gap-3"><div className="w-10 h-12 bg-gray-200 rounded-sm"/><div className="space-y-2 w-32"><div className="h-3 bg-gray-200 rounded"/><div className="h-2 bg-gray-100 rounded w-20"/></div></div></td>
-                    {[...Array(5)].map((__, j) => (
-                      <td key={j} className="px-5 py-4"><div className="h-3 bg-gray-100 rounded w-16"/></td>
-                    ))}
-                  </tr>
-                ))
+                [...Array(5)].map((_, i) => <tr key={i} className="animate-pulse"><td colSpan={6} className="px-6 py-10 bg-gray-50/50"></td></tr>)
               ) : products.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-20">
-                    <div className="flex flex-col items-center justify-center animate-slide-up">
-                      <div className="w-16 h-16 bg-gray-50 rounded-full flex items-center justify-center mb-4">
-                        <FiAlertTriangle size={24} className="text-muted/50"/>
-                      </div>
-                      <p className="font-medium text-dark">No products found</p>
-                      <p className="text-xs text-muted mt-1">Try adjusting your search or filters</p>
-                    </div>
-                  </td>
+                  <td colSpan={6} className="text-center py-24"><p className="text-gray-500">No products found</p></td>
                 </tr>
               ) : (
-                products.map((p, index) => (
-                  <tr 
+                products.map((p) => (
+                  <motion.tr 
                     key={p._id} 
-                    className="hover:bg-warm/5 transition-colors group animate-slide-up"
-                    style={{ animationDelay: `${index * 50}ms` }} // Staggered Animation
+                    initial={{ opacity: 0 }}
+                    whileInView={{ opacity: 1 }}
+                    viewport={{ once: true }}
+                    whileHover={{ scale: 1.01, backgroundColor: "#FAF7F2", zIndex: 10, boxShadow: "0 4px 20px rgba(0,0,0,0.05)" }}
+                    transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                    className="bg-white relative"
                   >
+                    
                     {/* Product Info */}
-                    <td className="px-5 py-3">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-12 rounded-sm overflow-hidden bg-gray-100 border border-soft flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
+                    <td className="px-4 md:px-6 py-4">
+                      <div className="flex items-center gap-3 md:gap-4">
+                        <div className="w-12 h-16 rounded-sm overflow-hidden bg-gray-100 border border-[#E5E5E5] flex-shrink-0 shadow-sm">
                           {p.images?.[0]
                             ? <img src={p.images[0]} alt={p.name} className="w-full h-full object-cover"/>
-                            : <div className="w-full h-full flex items-center justify-center text-muted/30 text-[10px]">IMG</div>}
+                            : <div className="w-full h-full flex items-center justify-center text-gray-400 text-[9px]">IMG</div>}
                         </div>
-                        <div className="min-w-0">
-                          <p className="font-medium text-dark leading-tight truncate max-w-[180px]">{p.name}</p>
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-[#1C1917] leading-snug truncate max-w-[150px] md:max-w-xs">{p.name}</p>
+                          
+                          {/* 💡 FIX: Featured Badge is now visible on BOTH Mobile and Desktop */}
                           {p.isFeatured && (
-                            <span className="inline-block mt-1 text-[9px] font-bold tracking-wider text-warm bg-warm/10 px-1.5 py-0.5 rounded-sm">
-                              FEATURED
+                            <span className="inline-block mt-1 text-[8px] font-bold text-white bg-[#C4A882] px-1.5 py-0.5 rounded-sm uppercase tracking-wider">
+                              Featured
                             </span>
                           )}
+
+                          {/* Mobile-only Price */}
+                          <div className="mt-1 md:hidden">
+                            <span className="font-bold text-[#1C1917] text-xs">{formatPrice(p.price)}</span>
+                          </div>
                         </div>
                       </div>
                     </td>
 
-                    {/* Category */}
-                    <td className="px-5 py-3">
-                      <span className="text-xs text-muted font-medium bg-gray-50 border border-soft px-2.5 py-1 rounded-full">
-                        {p.category}
-                      </span>
+                    <td className="hidden md:table-cell px-6 py-4 text-gray-600">{p.category}</td>
+                    <td className="hidden md:table-cell px-6 py-4 font-bold text-[#1C1917]">{formatPrice(p.price)}</td>
+                    <td className="hidden md:table-cell px-6 py-4">
+                      <span className={`text-xs font-semibold ${p.stockQuantity === 0 ? 'text-red-600' : 'text-emerald-700'}`}>{p.stockQuantity}</span>
+                    </td>
+                    <td className="hidden md:table-cell px-6 py-4">
+                      <div className="flex items-center gap-1"><FiStar size={12} className="text-amber-400 fill-amber-400"/><span className="text-xs font-bold">{p.averageRating || 0}</span></div>
                     </td>
 
-                    {/* Price */}
-                    <td className="px-5 py-3">
-                      <div className="flex flex-col">
-                        <span className="font-medium text-dark">{formatPrice(p.price)}</span>
-                        {p.originalPrice && (
-                          <span className="text-[10px] text-muted line-through">{formatPrice(p.originalPrice)}</span>
+                    {/* Actions - ALWAYS Visible on Desktop */}
+                    <td className="px-4 md:px-6 py-4 text-right md:text-left">
+                      {/* Desktop View Icons */}
+                      <div className="hidden md:flex items-center gap-2">
+                        <Link 
+                          to={`/admin/products/${p._id}/edit`} 
+                          className="p-2 text-gray-600 hover:text-[#C4A882] hover:bg-orange-50 rounded-sm transition-all shadow-sm border border-[#E5E5E5]"
+                          title="Edit Product"
+                        >
+                          <FiEdit2 size={15}/>
+                        </Link>
+                        <button 
+                          onClick={() => setDelId(p._id)} 
+                          className="p-2 text-red-500 hover:text-white hover:bg-red-500 rounded-sm transition-all shadow-sm border border-red-200"
+                          title="Delete Product"
+                        >
+                          <FiTrash2 size={15}/>
+                        </button>
+                      </div>
+
+                      {/* Mobile 3 Dots Menu */}
+                      <div className="md:hidden relative inline-block">
+                        <button onClick={(e) => { e.stopPropagation(); setActiveMenu(activeMenu === p._id ? null : p._id); }} className="p-2 text-gray-500">
+                          <FiMoreVertical size={20}/>
+                        </button>
+                        {activeMenu === p._id && (
+                          <div className="absolute right-0 top-full mt-1 w-32 bg-white border border-[#E5E5E5] shadow-xl rounded-sm z-50 animate-scale-in">
+                            <Link to={`/admin/products/${p._id}/edit`} className="flex items-center gap-2 px-4 py-3 text-xs font-medium text-[#1C1917] hover:bg-gray-50 w-full text-left"><FiEdit2 size={14}/> Edit</Link>
+                            <button onClick={() => { setDelId(p._id); setActiveMenu(null); }} className="flex items-center gap-2 px-4 py-3 text-xs font-medium text-red-600 hover:bg-red-50 w-full text-left border-t border-[#E5E5E5]"><FiTrash2 size={14}/> Delete</button>
+                          </div>
                         )}
                       </div>
                     </td>
-
-                    {/* Stock */}
-                    <td className="px-5 py-3">
-                      <div className="flex items-center gap-2">
-                        <span className={`w-2 h-2 rounded-full ${p.stockQuantity > 10 ? 'bg-green-500' : p.stockQuantity > 0 ? 'bg-yellow-500' : 'bg-red-500'}`}></span>
-                        <span className={`text-xs font-medium 
-                          ${p.stockQuantity === 0 ? 'text-red-600'
-                            : p.stockQuantity < 10 ? 'text-yellow-700'
-                            : 'text-green-700'}`}>
-                          {p.stockQuantity === 0 ? 'Out of Stock' : `${p.stockQuantity} Units`}
-                        </span>
-                      </div>
-                    </td>
-
-                    {/* Rating */}
-                    <td className="px-5 py-3">
-                      <div className="flex items-center gap-1.5">
-                        <FiStar size={13} className="fill-amber-400 text-amber-400"/>
-                        <span className="text-sm font-medium text-dark">{p.averageRating || 0}</span>
-                        <span className="text-xs text-muted">({p.numReviews})</span>
-                      </div>
-                    </td>
-
-                    {/* Actions */}
-                    <td className="px-5 py-3">
-                      <div className="flex items-center gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
-                        <Link 
-                          to={`/admin/products/${p._id}/edit`}
-                          className="p-2 text-muted hover:text-dark hover:bg-white border border-transparent hover:border-soft rounded-sm transition-all"
-                          title="Edit"
-                        >
-                          <FiEdit2 size={14}/>
-                        </Link>
-                        <button 
-                          onClick={() => setDelId(p._id)}
-                          className="p-2 text-muted hover:text-red-600 hover:bg-red-50 border border-transparent hover:border-red-100 rounded-sm transition-all"
-                          title="Delete"
-                        >
-                          <FiTrash2 size={14}/>
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
+                  </motion.tr>
                 ))
               )}
             </tbody>
           </table>
         </div>
-
-        {/* Pagination */}
-        {totalPages > 1 && (
-          <div className="flex flex-col sm:flex-row justify-between items-center px-5 py-4 border-t border-soft bg-gray-50/50">
-            <span className="text-xs text-muted mb-2 sm:mb-0">Showing page {page} of {totalPages}</span>
-            <div className="flex gap-1.5">
-              <button 
-                disabled={page === 1} 
-                onClick={() => setPage((p) => p - 1)}
-                className="px-3 py-1.5 text-xs font-medium border border-soft rounded-sm disabled:opacity-40 hover:bg-white hover:text-dark transition-colors"
-              >
-                Prev
-              </button>
-              
-              {Array.from({ length: totalPages }, (_, i) => i + 1)
-                .slice(Math.max(0, page - 3), Math.min(totalPages, page + 2)) // Smart slicing for many pages
-                .map((p) => (
-                <button 
-                  key={p} 
-                  onClick={() => setPage(p)}
-                  className={`w-8 h-8 flex items-center justify-center text-xs rounded-sm border transition-all duration-200
-                    ${page === p ? 'bg-dark text-white border-dark shadow-sm' : 'bg-white border-soft text-muted hover:border-dark hover:text-dark'}`}
-                >
-                  {p}
-                </button>
-              ))}
-              
-              <button 
-                disabled={page === totalPages} 
-                onClick={() => setPage((p) => p + 1)}
-                className="px-3 py-1.5 text-xs font-medium border border-soft rounded-sm disabled:opacity-40 hover:bg-white hover:text-dark transition-colors"
-              >
-                Next
-              </button>
-            </div>
-          </div>
-        )}
       </div>
 
-      {/* Delete Modal - Animated */}
+      {/* Pagination */}
+      {totalPages > 1 && (
+        <div className="flex justify-between items-center px-6 py-4 mt-4 bg-white border border-[#E5E5E5] rounded-sm shadow-sm animate-slide-up" style={{ animationDelay: '0.4s' }}>
+          <span className="text-xs text-gray-500">Page {page} of {totalPages}</span>
+          <div className="flex gap-2">
+            <button disabled={page === 1} onClick={() => setPage(p => p - 1)} className="px-4 py-2 text-xs font-bold uppercase border border-[#E5E5E5] rounded-sm disabled:opacity-40 hover:bg-gray-50 transition-colors">Previous</button>
+            <button disabled={page === totalPages} onClick={() => setPage(p => p + 1)} className="px-4 py-2 text-xs font-bold uppercase border border-[#E5E5E5] rounded-sm disabled:opacity-40 hover:bg-gray-50 transition-colors">Next</button>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Confirmation Modal */}
       {delId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4">
-          {/* Backdrop */}
-          <div 
-            className="absolute inset-0 bg-dark/60 backdrop-blur-sm animate-fade-in"
-            onClick={() => setDelId(null)}
-          ></div>
-          
-          {/* Modal Content */}
-          <div className="bg-white rounded-lg p-8 max-w-sm w-full shadow-2xl relative z-10 animate-scale-in border border-soft">
-            <div className="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center mx-auto mb-5">
-              <FiTrash2 size={24} className="text-red-500"/>
-            </div>
-            
-            <h3 className="font-display text-xl text-center text-dark mb-2">Delete Product?</h3>
-            <p className="text-sm text-muted text-center mb-8 leading-relaxed">
-              Are you sure you want to delete this product? This action cannot be undone.
-            </p>
-            
+        <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
+          <div className="absolute inset-0 bg-[#1C1917]/40 backdrop-blur-sm" onClick={() => setDelId(null)}></div>
+          <div className="bg-white rounded-lg p-8 max-w-sm w-full shadow-2xl relative z-10 animate-scale-in border border-[#E5E5E5]">
+            <FiTrash2 size={32} className="text-red-500 mx-auto mb-4"/>
+            <h3 className="font-display text-2xl text-center mb-2 text-[#1C1917]">Are you sure?</h3>
+            <p className="text-gray-500 text-center text-sm mb-8">This product will be permanently removed from your store inventory.</p>
             <div className="flex gap-3">
-              <button 
-                onClick={() => setDelId(null)}
-                className="flex-1 py-3 text-sm font-medium text-dark border border-soft rounded-sm hover:bg-gray-50 transition-colors"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={() => handleDelete(delId)}
-                className="flex-1 py-3 text-sm font-medium text-white bg-red-600 rounded-sm hover:bg-red-700 hover:shadow-lg transition-all"
-              >
-                Delete It
-              </button>
+              <button onClick={() => setDelId(null)} className="flex-1 py-3 text-xs font-bold uppercase border border-[#E5E5E5] rounded-sm hover:bg-gray-50 transition-colors text-[#1C1917]">Cancel</button>
+              <button onClick={() => handleDelete(delId)} className="flex-1 py-3 text-xs font-bold uppercase text-white bg-red-600 rounded-sm hover:bg-red-700 shadow-lg shadow-red-200 transition-all">Delete</button>
             </div>
           </div>
         </div>
