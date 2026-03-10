@@ -1,8 +1,9 @@
 # VELOUR — Premium Fashion E-Commerce
-
 Full-Stack MERN E-Commerce for Men, Women & Kids clothing brand.
-
 **Author:** Manish Kumar | **License:** MIT
+
+
+<img width="1912" height="934" alt="Screenshot 2026-03-10 073143" src="https://github.com/user-attachments/assets/ac9d1f8f-acb2-4e30-918b-81ddd889de6a" />
 
 ---
 
