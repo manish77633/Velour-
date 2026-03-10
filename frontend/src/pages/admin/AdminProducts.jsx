@@ -9,25 +9,25 @@ import { motion } from 'framer-motion';
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
-  const [loading,  setLoading]  = useState(true);
-  const [search,   setSearch]   = useState('');
-  const [catFilter,setCatFilter]= useState('');
-  const [total,    setTotal]    = useState(0);
-  const [page,      setPage]     = useState(1);
-  const [delId,    setDelId]    = useState(null); 
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+  const [catFilter, setCatFilter] = useState('');
+  const [total, setTotal] = useState(0);
+  const [page, setPage] = useState(1);
+  const [delId, setDelId] = useState(null);
   const [activeMenu, setActiveMenu] = useState(null);
 
   const loadProducts = useCallback(async () => {
     setLoading(true);
     try {
       const params = { page, limit: 10 };
-      if (search)    params.search   = search;
+      if (search) params.search = search;
       if (catFilter) params.category = catFilter;
       const { data } = await api.get('/products', { params });
       setProducts(data.products);
       setTotal(data.total);
     } catch { toast.error('Failed to load products'); }
-    finally  { setLoading(false); }
+    finally { setLoading(false); }
   }, [page, search, catFilter]);
 
   useEffect(() => { loadProducts(); }, [loadProducts]);
@@ -69,8 +69,8 @@ export default function AdminProducts() {
           <h1 className="font-display text-3xl md:text-4xl font-normal text-[#1C1917] tracking-tight">Products</h1>
           <p className="text-sm text-gray-500 mt-1 font-light tracking-wide">{total} products in inventory</p>
         </div>
-        <Link 
-          to="/admin/products/new" 
+        <Link
+          to="/admin/products/new"
           className="bg-[#1C1917] text-white px-8 py-3 rounded-sm text-xs font-bold uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg hover:bg-black transition-all active:scale-95"
         >
           <FiPlus size={16} /> <span>Add Product</span>
@@ -80,10 +80,10 @@ export default function AdminProducts() {
       {/* Filters Bar */}
       <div className="bg-white rounded-md border border-[#E5E5E5] p-3 mb-6 flex flex-col md:flex-row gap-3 shadow-sm animate-slide-up" style={{ animationDelay: '0.2s' }}>
         <div className="relative flex-1">
-          <FiSearch size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"/>
-          <input 
-            type="text" 
-            placeholder="Search products..." 
+          <FiSearch size={18} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+          <input
+            type="text"
+            placeholder="Search products..."
             value={search}
             onChange={(e) => { setSearch(e.target.value); setPage(1); }}
             className="w-full pl-11 pr-4 py-2.5 text-sm bg-gray-50/50 rounded-sm border border-transparent focus:bg-white focus:border-[#C4A882] outline-none transition-all"
@@ -91,8 +91,8 @@ export default function AdminProducts() {
         </div>
 
         <div className="flex gap-2">
-          <select 
-            value={catFilter} 
+          <select
+            value={catFilter}
             onChange={(e) => { setCatFilter(e.target.value); setPage(1); }}
             className="pl-4 pr-10 py-2.5 text-sm bg-gray-50/50 border border-transparent focus:bg-white focus:border-[#C4A882] rounded-sm outline-none cursor-pointer appearance-none"
           >
@@ -100,7 +100,7 @@ export default function AdminProducts() {
             {['Men', 'Women', 'Kids', 'Accessories'].map(cat => <option key={cat} value={cat}>{cat}</option>)}
           </select>
           {(search || catFilter) && (
-            <button onClick={() => { setSearch(''); setCatFilter(''); setPage(1); }} className="px-4 text-red-500 bg-red-50 hover:bg-red-100 rounded-sm"><FiX size={18}/></button>
+            <button onClick={() => { setSearch(''); setCatFilter(''); setPage(1); }} className="px-4 text-red-500 bg-red-50 hover:bg-red-100 rounded-sm"><FiX size={18} /></button>
           )}
         </div>
       </div>
@@ -119,7 +119,7 @@ export default function AdminProducts() {
                 <th className="px-6 py-4 text-[10px] tracking-[0.15em] uppercase font-bold text-gray-500 text-right md:text-left">Actions</th>
               </tr>
             </thead>
-            
+
             <tbody className="divide-y divide-[#E5E5E5]">
               {loading ? (
                 [...Array(5)].map((_, i) => <tr key={i} className="animate-pulse"><td colSpan={6} className="px-6 py-10 bg-gray-50/50"></td></tr>)
@@ -129,8 +129,8 @@ export default function AdminProducts() {
                 </tr>
               ) : (
                 products.map((p) => (
-                  <motion.tr 
-                    key={p._id} 
+                  <motion.tr
+                    key={p._id}
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
@@ -138,18 +138,18 @@ export default function AdminProducts() {
                     transition={{ type: "spring", stiffness: 300, damping: 20 }}
                     className="bg-white relative"
                   >
-                    
+
                     {/* Product Info */}
                     <td className="px-4 md:px-6 py-4">
                       <div className="flex items-center gap-3 md:gap-4">
                         <div className="w-12 h-16 rounded-sm overflow-hidden bg-gray-100 border border-[#E5E5E5] flex-shrink-0 shadow-sm">
                           {p.images?.[0]
-                            ? <img src={p.images[0]} alt={p.name} className="w-full h-full object-cover"/>
+                            ? <img src={p.images[0]} alt={p.name} className="w-full h-full object-cover" />
                             : <div className="w-full h-full flex items-center justify-center text-gray-400 text-[9px]">IMG</div>}
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="font-medium text-[#1C1917] leading-snug truncate max-w-[150px] md:max-w-xs">{p.name}</p>
-                          
+
                           {/* 💡 FIX: Featured Badge is now visible on BOTH Mobile and Desktop */}
                           {p.isFeatured && (
                             <span className="inline-block mt-1 text-[8px] font-bold text-white bg-[#C4A882] px-1.5 py-0.5 rounded-sm uppercase tracking-wider">
@@ -168,41 +168,55 @@ export default function AdminProducts() {
                     <td className="hidden md:table-cell px-6 py-4 text-gray-600">{p.category}</td>
                     <td className="hidden md:table-cell px-6 py-4 font-bold text-[#1C1917]">{formatPrice(p.price)}</td>
                     <td className="hidden md:table-cell px-6 py-4">
-                      <span className={`text-xs font-semibold ${p.stockQuantity === 0 ? 'text-red-600' : 'text-emerald-700'}`}>{p.stockQuantity}</span>
+                      <div className="flex flex-col gap-1">
+                        <span className={`text-xs font-semibold ${p.stockQuantity === 0 ? 'text-red-600' : p.stockQuantity < 10 ? 'text-orange-600' : 'text-emerald-700'}`}>
+                          {p.stockQuantity}
+                        </span>
+                        {p.stockQuantity > 0 && p.stockQuantity < 10 && (
+                          <span className="text-[8px] font-bold uppercase tracking-tighter text-orange-600 bg-orange-50 px-1 py-0.5 rounded-sm border border-orange-100 w-fit">
+                            Low Stock
+                          </span>
+                        )}
+                        {p.stockQuantity === 0 && (
+                          <span className="text-[8px] font-bold uppercase tracking-tighter text-red-600 bg-red-50 px-1 py-0.5 rounded-sm border border-red-100 w-fit">
+                            Out of Stock
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="hidden md:table-cell px-6 py-4">
-                      <div className="flex items-center gap-1"><FiStar size={12} className="text-amber-400 fill-amber-400"/><span className="text-xs font-bold">{p.averageRating || 0}</span></div>
+                      <div className="flex items-center gap-1"><FiStar size={12} className="text-amber-400 fill-amber-400" /><span className="text-xs font-bold">{p.averageRating || 0}</span></div>
                     </td>
 
                     {/* Actions - ALWAYS Visible on Desktop */}
                     <td className="px-4 md:px-6 py-4 text-right md:text-left">
                       {/* Desktop View Icons */}
                       <div className="hidden md:flex items-center gap-2">
-                        <Link 
-                          to={`/admin/products/${p._id}/edit`} 
+                        <Link
+                          to={`/admin/products/${p._id}/edit`}
                           className="p-2 text-gray-600 hover:text-[#C4A882] hover:bg-orange-50 rounded-sm transition-all shadow-sm border border-[#E5E5E5]"
                           title="Edit Product"
                         >
-                          <FiEdit2 size={15}/>
+                          <FiEdit2 size={15} />
                         </Link>
-                        <button 
-                          onClick={() => setDelId(p._id)} 
+                        <button
+                          onClick={() => setDelId(p._id)}
                           className="p-2 text-red-500 hover:text-white hover:bg-red-500 rounded-sm transition-all shadow-sm border border-red-200"
                           title="Delete Product"
                         >
-                          <FiTrash2 size={15}/>
+                          <FiTrash2 size={15} />
                         </button>
                       </div>
 
                       {/* Mobile 3 Dots Menu */}
                       <div className="md:hidden relative inline-block">
                         <button onClick={(e) => { e.stopPropagation(); setActiveMenu(activeMenu === p._id ? null : p._id); }} className="p-2 text-gray-500">
-                          <FiMoreVertical size={20}/>
+                          <FiMoreVertical size={20} />
                         </button>
                         {activeMenu === p._id && (
                           <div className="absolute right-0 top-full mt-1 w-32 bg-white border border-[#E5E5E5] shadow-xl rounded-sm z-50 animate-scale-in">
-                            <Link to={`/admin/products/${p._id}/edit`} className="flex items-center gap-2 px-4 py-3 text-xs font-medium text-[#1C1917] hover:bg-gray-50 w-full text-left"><FiEdit2 size={14}/> Edit</Link>
-                            <button onClick={() => { setDelId(p._id); setActiveMenu(null); }} className="flex items-center gap-2 px-4 py-3 text-xs font-medium text-red-600 hover:bg-red-50 w-full text-left border-t border-[#E5E5E5]"><FiTrash2 size={14}/> Delete</button>
+                            <Link to={`/admin/products/${p._id}/edit`} className="flex items-center gap-2 px-4 py-3 text-xs font-medium text-[#1C1917] hover:bg-gray-50 w-full text-left"><FiEdit2 size={14} /> Edit</Link>
+                            <button onClick={() => { setDelId(p._id); setActiveMenu(null); }} className="flex items-center gap-2 px-4 py-3 text-xs font-medium text-red-600 hover:bg-red-50 w-full text-left border-t border-[#E5E5E5]"><FiTrash2 size={14} /> Delete</button>
                           </div>
                         )}
                       </div>
@@ -231,7 +245,7 @@ export default function AdminProducts() {
         <div className="fixed inset-0 z-[60] flex items-center justify-center px-4">
           <div className="absolute inset-0 bg-[#1C1917]/40 backdrop-blur-sm" onClick={() => setDelId(null)}></div>
           <div className="bg-white rounded-lg p-8 max-w-sm w-full shadow-2xl relative z-10 animate-scale-in border border-[#E5E5E5]">
-            <FiTrash2 size={32} className="text-red-500 mx-auto mb-4"/>
+            <FiTrash2 size={32} className="text-red-500 mx-auto mb-4" />
             <h3 className="font-display text-2xl text-center mb-2 text-[#1C1917]">Are you sure?</h3>
             <p className="text-gray-500 text-center text-sm mb-8">This product will be permanently removed from your store inventory.</p>
             <div className="flex gap-3">

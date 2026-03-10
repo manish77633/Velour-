@@ -3,10 +3,10 @@
 // Run: node seeder.js -d     → clears all data
 
 const mongoose = require('mongoose');
-const dotenv   = require('dotenv');
-const User     = require('./models/User');
-const Product  = require('./models/Product');
-const Order    = require('./models/Order');
+const dotenv = require('dotenv');
+const User = require('./models/User');
+const Product = require('./models/Product');
+const Order = require('./models/Order');
 
 dotenv.config();
 
@@ -496,10 +496,11 @@ const seedDB = async () => {
   const adminExists = await User.findOne({ email: 'admin@velour.com' });
   if (!adminExists) {
     await User.create({
-      name:       'Manish Kumar',
-      email:      'admin@velour.com',
-      password:   'admin123',   // change after first login!
-      role:       'admin',
+      name: 'Manish Kumar',
+      email: 'admin@velour.com',
+      password: 'admin123',   // change after first login!
+      role: 'admin',
+      isAdmin: true,
       isVerified: true,
     });
     console.log('👤 Admin user created → admin@velour.com / admin123');

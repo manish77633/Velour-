@@ -1,6 +1,6 @@
-const jwt      = require('jsonwebtoken');
+const jwt = require('jsonwebtoken');
 const passport = require('passport');
-const User     = require('../models/User');
+const User = require('../models/User');
 
 // ── Generate JWT ─────────────────────────────────────────────
 const generateToken = (id) =>
@@ -27,10 +27,11 @@ const register = async (req, res) => {
     success: true,
     token: generateToken(user._id),
     user: {
-      _id:            user._id,
-      name:           user.name,
-      email:          user.email,
-      role:           user.role,
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      isAdmin: user.isAdmin,
       profilePicture: user.profilePicture,
     },
   });
@@ -58,10 +59,11 @@ const login = async (req, res) => {
     success: true,
     token: generateToken(user._id),
     user: {
-      _id:            user._id,
-      name:           user.name,
-      email:          user.email,
-      role:           user.role,
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      isAdmin: user.isAdmin,
       profilePicture: user.profilePicture,
     },
   });

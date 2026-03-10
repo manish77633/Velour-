@@ -9,10 +9,10 @@ import {
 } from 'react-icons/fi';
 
 const NAV = [
-  { label: 'Dashboard', to: '/admin',           icon: FiGrid       },
-  { label: 'Products',  to: '/admin/products',   icon: FiPackage    },
-  { label: 'Orders',    to: '/admin/orders',     icon: FiShoppingBag},
-  { label: 'Users',     to: '/admin/users',      icon: FiUsers      },
+  { label: 'Dashboard', to: '/admin', icon: FiGrid },
+  { label: 'Products', to: '/admin/products', icon: FiPackage },
+  { label: 'Orders', to: '/admin/orders', icon: FiShoppingBag },
+  { label: 'Users', to: '/admin/users', icon: FiUsers },
 ];
 
 export default function AdminLayout() {
@@ -23,7 +23,7 @@ export default function AdminLayout() {
   const { user } = useSelector((s) => s.auth);
 
   // Redirect if not admin
-  if (!user || user.role !== 'admin') {
+  if (!user || !(user.isAdmin || user.role === 'admin')) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-cream">
         <div className="text-center">
@@ -61,27 +61,27 @@ export default function AdminLayout() {
                 ${isActive(to)
                   ? 'bg-warm text-white font-medium'
                   : 'text-cream/60 hover:text-cream hover:bg-white/8'}`}>
-              <Icon size={16}/> {label}
+              <Icon size={16} /> {label}
             </Link>
           ))}
         </nav>
 
         {/* Bottom Actions */}
         <div className="px-3 py-4 border-t border-white/10 space-y-1">
-          <Link to="/" target="_blank"
+          <Link to="/"
             className="flex items-center gap-3 px-4 py-2.5 text-sm text-cream/50 hover:text-cream hover:bg-white/8 rounded-sm transition-all">
-            <FiExternalLink size={15}/> View Store
+            <FiExternalLink size={15} /> View Store
           </Link>
           <button onClick={() => { dispatch(logout()); navigate('/login'); }}
             className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-cream/50 hover:text-red-400 hover:bg-red-500/10 rounded-sm transition-all text-left">
-            <FiLogOut size={15}/> Sign Out
+            <FiLogOut size={15} /> Sign Out
           </button>
         </div>
       </aside>
 
       {/* Mobile overlay */}
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-dark/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)}/>
+        <div className="fixed inset-0 bg-dark/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
       )}
 
       {/* ── MAIN CONTENT ── */}
@@ -91,7 +91,7 @@ export default function AdminLayout() {
         <header className="bg-white border-b border-soft px-6 py-4 flex items-center justify-between sticky top-0 z-30">
           <button onClick={() => setSidebarOpen(!sidebarOpen)}
             className="lg:hidden w-9 h-9 flex items-center justify-center rounded-sm hover:bg-soft transition-colors">
-            {sidebarOpen ? <FiX size={18}/> : <FiMenu size={18}/>}
+            {sidebarOpen ? <FiX size={18} /> : <FiMenu size={18} />}
           </button>
 
           <div className="flex items-center gap-4 ml-auto">
@@ -113,7 +113,7 @@ export default function AdminLayout() {
 
         {/* Page Content */}
         <main className="flex-1 p-6">
-          <Outlet/>
+          <Outlet />
         </main>
       </div>
     </div>
